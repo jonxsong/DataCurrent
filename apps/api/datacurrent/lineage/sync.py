@@ -1,5 +1,4 @@
 import asyncio
-import uuid
 from typing import Any
 
 import psycopg
@@ -112,7 +111,9 @@ async def _postgres_dependencies(config: dict[str, Any]) -> list[dict[str, str]]
           JOIN pg_namespace tgt_ns ON tgt_ns.oid = tgt.relnamespace
          WHERE fk.contype = 'f'
     """
-    async with await psycopg.AsyncConnection.connect(**connector._kwargs(), row_factory=dict_row) as conn:
+    async with await psycopg.AsyncConnection.connect(
+        **connector._kwargs(), row_factory=dict_row
+    ) as conn:
         rows = await (await conn.execute(query)).fetchall()
     return list(rows)
 
@@ -142,17 +143,19 @@ async def sync_dependencies(db: AsyncSession, connection: DatabaseConnection) ->
         dependencies = await asyncio.to_thread(_snowflake_dependencies_sync, config)
     nodes = list(
         (
-            await db.scalars(
-                select(LineageNode).where(LineageNode.connection_id == connection.id)
-            )
+            await db.scalars(select(LineageNode).where(LineageNode.connection_id == connection.id))
         ).all()
     )
     by_external = {node.external_id.lower(): node for node in nodes}
     by_label = {node.label.lower(): node for node in nodes}
     count = 0
     for dependency in dependencies:
-        source = by_external.get(dependency["source_id"].lower()) or by_label.get(dependency["source_id"].lower())
-        target = by_external.get(dependency["target_id"].lower()) or by_label.get(dependency["target_id"].lower())
+        source = by_external.get(dependency["source_id"].lower()) or by_label.get(
+            dependency["source_id"].lower()
+        )
+        target = by_external.get(dependency["target_id"].lower()) or by_label.get(
+            dependency["target_id"].lower()
+        )
         if not source or not target:
             continue
         await db.execute(

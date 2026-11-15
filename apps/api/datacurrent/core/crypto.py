@@ -4,7 +4,6 @@ import json
 from typing import Any
 
 from cryptography.fernet import Fernet, InvalidToken
-
 from datacurrent.core.config import get_settings
 from datacurrent.core.errors import DataCurrentError
 

@@ -1,8 +1,7 @@
 import uuid
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
-
 from datacurrent.models.entities import WorkspaceRole
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
 class RegisterRequest(BaseModel):
@@ -14,7 +13,11 @@ class RegisterRequest(BaseModel):
     @field_validator("password")
     @classmethod
     def validate_password_strength(cls, value: str) -> str:
-        classes = [any(c.islower() for c in value), any(c.isupper() for c in value), any(c.isdigit() for c in value)]
+        classes = [
+            any(c.islower() for c in value),
+            any(c.isupper() for c in value),
+            any(c.isdigit() for c in value),
+        ]
         if sum(classes) < 2:
             raise ValueError("Password must contain at least two character classes")
         return value

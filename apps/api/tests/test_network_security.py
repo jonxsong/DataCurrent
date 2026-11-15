@@ -1,5 +1,4 @@
 import pytest
-
 from datacurrent.connectors.network import validate_database_host
 
 

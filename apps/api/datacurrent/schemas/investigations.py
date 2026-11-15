@@ -1,8 +1,7 @@
 import uuid
 
-from pydantic import BaseModel, Field
-
 from datacurrent.ai.investigator import InvestigationReport
+from pydantic import BaseModel, Field
 
 
 class InvestigationRequest(BaseModel):

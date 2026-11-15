@@ -1,9 +1,5 @@
 import uuid
 
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy import or_, select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from datacurrent.api.dependencies import require_role, workspace_membership
 from datacurrent.core.database import get_db
 from datacurrent.core.errors import DataCurrentError
@@ -21,7 +17,9 @@ from datacurrent.schemas.lineage import (
     LineageNodeResponse,
     LineageSyncResponse,
 )
-
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import or_, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/workspaces/{workspace_id}/lineage", tags=["lineage"])
 
@@ -68,14 +66,19 @@ async def lineage_graph(
                 await db.scalars(
                     select(LineageEdge).where(
                         LineageEdge.workspace_id == workspace_id,
-                        or_(LineageEdge.source_node_id.in_(node_ids), LineageEdge.target_node_id.in_(node_ids)),
+                        or_(
+                            LineageEdge.source_node_id.in_(node_ids),
+                            LineageEdge.target_node_id.in_(node_ids),
+                        ),
                     )
                 )
             ).all()
         )
     return LineageGraphResponse(
         nodes=[
-            LineageNodeResponse(id=node.id, label=node.label, kind=node.kind, metadata=node.metadata_json)
+            LineageNodeResponse(
+                id=node.id, label=node.label, kind=node.kind, metadata=node.metadata_json
+            )
             for node in nodes
         ],
         edges=[

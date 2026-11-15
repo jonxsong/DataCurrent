@@ -1,6 +1,7 @@
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Any, Iterable
+from typing import Any
 
 
 @dataclass
@@ -30,7 +31,9 @@ class PlanNode:
             "total_cost": float(self.total_cost) if self.total_cost is not None else None,
             "estimated_rows": self.estimated_rows,
             "actual_rows": self.actual_rows,
-            "actual_time_ms": float(self.actual_time_ms) if self.actual_time_ms is not None else None,
+            "actual_time_ms": float(self.actual_time_ms)
+            if self.actual_time_ms is not None
+            else None,
             "loops": self.loops,
             "filter": self.filter,
             "index_name": self.index_name,
@@ -62,8 +65,18 @@ def parse_postgres_plan(payload: Any) -> PlanNode:
 
     def visit(node: dict[str, Any], path: str) -> PlanNode:
         ignored = {
-            "Plans", "Node Type", "Relation Name", "Alias", "Startup Cost", "Total Cost",
-            "Plan Rows", "Actual Rows", "Actual Total Time", "Actual Loops", "Filter", "Index Name",
+            "Plans",
+            "Node Type",
+            "Relation Name",
+            "Alias",
+            "Startup Cost",
+            "Total Cost",
+            "Plan Rows",
+            "Actual Rows",
+            "Actual Total Time",
+            "Actual Loops",
+            "Filter",
+            "Index Name",
         }
         return PlanNode(
             id=path,
@@ -78,7 +91,9 @@ def parse_postgres_plan(payload: Any) -> PlanNode:
             loops=node.get("Actual Loops"),
             filter=node.get("Filter"),
             index_name=node.get("Index Name"),
-            children=[visit(child, f"{path}.{index}") for index, child in enumerate(node.get("Plans", []))],
+            children=[
+                visit(child, f"{path}.{index}") for index, child in enumerate(node.get("Plans", []))
+            ],
             metadata={key: value for key, value in node.items() if key not in ignored},
         )
 
@@ -119,7 +134,10 @@ def analyze_plan(root: PlanNode) -> list[Finding]:
                 )
             )
         if node.actual_rows is not None and node.estimated_rows and node.estimated_rows > 0:
-            ratio = max(node.actual_rows / node.estimated_rows, node.estimated_rows / max(node.actual_rows, 1))
+            ratio = max(
+                node.actual_rows / node.estimated_rows,
+                node.estimated_rows / max(node.actual_rows, 1),
+            )
             if ratio >= 10:
                 findings.append(
                     Finding(

@@ -1,10 +1,6 @@
 import platform
 import uuid
 
-from fastapi import APIRouter, Depends
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from datacurrent.api.dependencies import require_role
 from datacurrent.core.crypto import decrypt_config
 from datacurrent.core.database import get_db
@@ -17,7 +13,9 @@ from datacurrent.models.entities import (
 )
 from datacurrent.schemas.benchmarks import BenchmarkRequest, BenchmarkResponse, MeasurementResponse
 from datacurrent.verification.benchmark import compare_queries
-
+from fastapi import APIRouter, Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/workspaces/{workspace_id}/benchmarks", tags=["benchmarks"])
 
@@ -84,8 +82,12 @@ async def run_benchmark(
     return BenchmarkResponse(
         benchmark_id=record.id,
         status=record.status,
-        original=MeasurementResponse(**{k: v for k, v in result.original.__dict__.items() if k != "result_digest"}),
-        candidate=MeasurementResponse(**{k: v for k, v in result.candidate.__dict__.items() if k != "result_digest"}),
+        original=MeasurementResponse(
+            **{k: v for k, v in result.original.__dict__.items() if k != "result_digest"}
+        ),
+        candidate=MeasurementResponse(
+            **{k: v for k, v in result.candidate.__dict__.items() if k != "result_digest"}
+        ),
         speedup_ratio=result.speedup_ratio,
         result_agreement=result.result_agreement,
         caveats=result.caveats,

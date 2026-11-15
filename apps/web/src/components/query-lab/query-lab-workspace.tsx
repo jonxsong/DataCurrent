@@ -9,7 +9,6 @@ import {
   Play,
   Save,
   ShieldCheck,
-  Sparkles,
   TriangleAlert,
 } from "lucide-react";
 

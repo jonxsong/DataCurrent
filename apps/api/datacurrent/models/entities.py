@@ -26,19 +26,19 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datacurrent.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 
-class WorkspaceRole(str, enum.Enum):
+class WorkspaceRole(enum.StrEnum):
     OWNER = "owner"
     ADMIN = "admin"
     MEMBER = "member"
     VIEWER = "viewer"
 
 
-class DatabaseProvider(str, enum.Enum):
+class DatabaseProvider(enum.StrEnum):
     POSTGRESQL = "postgresql"
     SNOWFLAKE = "snowflake"
 
 
-class ConnectionStatus(str, enum.Enum):
+class ConnectionStatus(enum.StrEnum):
     PENDING = "pending"
     HEALTHY = "healthy"
     DEGRADED = "degraded"
@@ -46,7 +46,7 @@ class ConnectionStatus(str, enum.Enum):
     DISABLED = "disabled"
 
 
-class EvidenceKind(str, enum.Enum):
+class EvidenceKind(enum.StrEnum):
     OBSERVED = "observed"
     HEURISTIC = "heuristic"
     HYPOTHESIS = "hypothesis"
@@ -78,7 +78,9 @@ class WorkspaceMembership(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     workspace_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
     )
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
     role: Mapped[WorkspaceRole] = mapped_column(Enum(WorkspaceRole, name="workspace_role"))
 
     workspace: Mapped[Workspace] = relationship(lazy="joined")
@@ -94,7 +96,9 @@ class DatabaseConnection(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
     )
     name: Mapped[str] = mapped_column(String(120))
-    provider: Mapped[DatabaseProvider] = mapped_column(Enum(DatabaseProvider, name="database_provider"))
+    provider: Mapped[DatabaseProvider] = mapped_column(
+        Enum(DatabaseProvider, name="database_provider")
+    )
     status: Mapped[ConnectionStatus] = mapped_column(
         Enum(ConnectionStatus, name="connection_status"),
         default=ConnectionStatus.PENDING,
@@ -128,7 +132,9 @@ class CatalogSchema(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class CatalogTable(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "catalog_tables"
 
-    schema_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("catalog_schemas.id", ondelete="CASCADE"), index=True)
+    schema_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("catalog_schemas.id", ondelete="CASCADE"), index=True
+    )
     external_id: Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(255))
     kind: Mapped[str] = mapped_column(String(40), default="table", server_default="table")
@@ -143,7 +149,9 @@ class CatalogTable(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class CatalogColumn(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "catalog_columns"
 
-    table_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("catalog_tables.id", ondelete="CASCADE"), index=True)
+    table_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("catalog_tables.id", ondelete="CASCADE"), index=True
+    )
     name: Mapped[str] = mapped_column(String(255))
     ordinal_position: Mapped[int] = mapped_column(Integer)
     data_type: Mapped[str] = mapped_column(String(255))
@@ -160,7 +168,9 @@ class CatalogColumn(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class CatalogIndex(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "catalog_indexes"
 
-    table_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("catalog_tables.id", ondelete="CASCADE"), index=True)
+    table_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("catalog_tables.id", ondelete="CASCADE"), index=True
+    )
     name: Mapped[str] = mapped_column(String(255))
     definition: Mapped[str] = mapped_column(Text)
     column_names: Mapped[list[str]] = mapped_column(ARRAY(String(255)))
@@ -182,9 +192,15 @@ class QueryFingerprint(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     fingerprint_hash: Mapped[str] = mapped_column(String(64))
     normalized_sql: Mapped[str] = mapped_column(Text)
     operation: Mapped[str | None] = mapped_column(String(32))
-    referenced_objects: Mapped[list[str]] = mapped_column(ARRAY(String(512)), default=list, server_default="{}")
-    first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
+    referenced_objects: Mapped[list[str]] = mapped_column(
+        ARRAY(String(512)), default=list, server_default="{}"
+    )
+    first_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    last_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
 
     __table_args__ = (UniqueConstraint("connection_id", "fingerprint_hash"),)
 
@@ -192,9 +208,15 @@ class QueryFingerprint(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class QueryMetricSnapshot(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "query_metric_snapshots"
 
-    workspace_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("workspaces.id", ondelete="CASCADE"), index=True)
-    query_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("query_fingerprints.id", ondelete="CASCADE"), index=True)
-    captured_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    )
+    query_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("query_fingerprints.id", ondelete="CASCADE"), index=True
+    )
+    captured_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
     interval_seconds: Mapped[int] = mapped_column(Integer)
     calls: Mapped[int] = mapped_column(BigInteger)
     total_time_ms: Mapped[Decimal] = mapped_column(Numeric(20, 3))
@@ -213,7 +235,9 @@ class QueryMetricSnapshot(UUIDPrimaryKeyMixin, Base):
 class ExecutionPlan(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "execution_plans"
 
-    workspace_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("workspaces.id", ondelete="CASCADE"), index=True)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    )
     query_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("query_fingerprints.id", ondelete="SET NULL"), index=True
     )
@@ -222,21 +246,31 @@ class ExecutionPlan(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     planning_time_ms: Mapped[Decimal | None] = mapped_column(Numeric(20, 3))
     execution_time_ms: Mapped[Decimal | None] = mapped_column(Numeric(20, 3))
     analyzed: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
-    heuristics: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list, server_default="[]")
+    heuristics: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSONB, default=list, server_default="[]"
+    )
 
 
 class Investigation(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "investigations"
 
-    workspace_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("workspaces.id", ondelete="CASCADE"), index=True)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    )
     created_by_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"))
-    query_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("query_fingerprints.id", ondelete="SET NULL"))
-    plan_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("execution_plans.id", ondelete="SET NULL"))
+    query_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("query_fingerprints.id", ondelete="SET NULL")
+    )
+    plan_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("execution_plans.id", ondelete="SET NULL")
+    )
     title: Mapped[str] = mapped_column(String(240))
     status: Mapped[str] = mapped_column(String(32), default="open", server_default="open")
     question: Mapped[str | None] = mapped_column(Text)
     summary: Mapped[str | None] = mapped_column(Text)
-    evidence_refs: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list, server_default="[]")
+    evidence_refs: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSONB, default=list, server_default="[]"
+    )
 
 
 class OptimizationRecommendation(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -262,11 +296,15 @@ class OptimizationRecommendation(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class BenchmarkRun(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "benchmark_runs"
 
-    workspace_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("workspaces.id", ondelete="CASCADE"), index=True)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    )
     recommendation_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("optimization_recommendations.id", ondelete="SET NULL")
     )
-    connection_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("database_connections.id", ondelete="RESTRICT"))
+    connection_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("database_connections.id", ondelete="RESTRICT")
+    )
     original_sql: Mapped[str] = mapped_column(Text)
     candidate_sql: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(32), default="queued", server_default="queued")
@@ -279,7 +317,9 @@ class BenchmarkRun(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     result_agreement: Mapped[str | None] = mapped_column(String(40))
     environment: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default="{}")
     methodology: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default="{}")
-    raw_measurements: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default="{}")
+    raw_measurements: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default="{}"
+    )
 
     __table_args__ = (
         CheckConstraint("warmup_iterations BETWEEN 0 AND 20", name="warmup_iterations"),
@@ -290,9 +330,15 @@ class BenchmarkRun(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class LineageNode(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "lineage_nodes"
 
-    workspace_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("workspaces.id", ondelete="CASCADE"), index=True)
-    connection_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("database_connections.id", ondelete="CASCADE"))
-    catalog_table_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("catalog_tables.id", ondelete="CASCADE"))
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    )
+    connection_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("database_connections.id", ondelete="CASCADE")
+    )
+    catalog_table_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("catalog_tables.id", ondelete="CASCADE")
+    )
     external_id: Mapped[str] = mapped_column(String(512))
     label: Mapped[str] = mapped_column(String(255))
     kind: Mapped[str] = mapped_column(String(40))
@@ -304,11 +350,19 @@ class LineageNode(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class LineageEdge(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "lineage_edges"
 
-    workspace_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("workspaces.id", ondelete="CASCADE"), index=True)
-    source_node_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("lineage_nodes.id", ondelete="CASCADE"), index=True)
-    target_node_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("lineage_nodes.id", ondelete="CASCADE"), index=True)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    )
+    source_node_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("lineage_nodes.id", ondelete="CASCADE"), index=True
+    )
+    target_node_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("lineage_nodes.id", ondelete="CASCADE"), index=True
+    )
     relationship: Mapped[str] = mapped_column(String(40))
-    evidence_kind: Mapped[EvidenceKind] = mapped_column(Enum(EvidenceKind, name="lineage_evidence_kind"))
+    evidence_kind: Mapped[EvidenceKind] = mapped_column(
+        Enum(EvidenceKind, name="lineage_evidence_kind")
+    )
     evidence: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default="{}")
 
     __table_args__ = (
@@ -320,9 +374,15 @@ class LineageEdge(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class AuditEvent(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "audit_events"
 
-    workspace_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("workspaces.id", ondelete="CASCADE"), index=True)
-    actor_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
-    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    )
+    actor_user_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL")
+    )
+    occurred_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
     event_type: Mapped[str] = mapped_column(String(100))
     resource_type: Mapped[str] = mapped_column(String(80))
     resource_id: Mapped[str | None] = mapped_column(String(255))

@@ -1,14 +1,11 @@
 import asyncio
 import uuid
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
-from typing import AsyncIterator
 
 import structlog
 from celery import Celery
-from redis.asyncio import Redis
-from sqlalchemy import delete, select
-
 from datacurrent.collection import collect_connection_metrics
 from datacurrent.core.config import get_settings
 from datacurrent.core.database import SessionFactory
@@ -18,7 +15,8 @@ from datacurrent.models.entities import (
     QueryMetricSnapshot,
     Workspace,
 )
-
+from redis.asyncio import Redis
+from sqlalchemy import delete, select
 
 settings = get_settings()
 logger = structlog.get_logger(__name__)

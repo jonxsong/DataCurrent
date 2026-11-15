@@ -30,5 +30,7 @@ def detect_regression(
         baseline_ms=baseline,
         recent_ms=recent,
         ratio=ratio,
-        confidence="high" if len(baseline_samples) >= 20 and len(recent_samples) >= 10 else "medium",
+        confidence="high"
+        if len(baseline_samples) >= 20 and len(recent_samples) >= 10
+        else "medium",
     )

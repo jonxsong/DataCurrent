@@ -1,11 +1,6 @@
 import uuid
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal
 from typing import Literal
-
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy import func, select, text
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from datacurrent.api.dependencies import workspace_membership
 from datacurrent.core.database import get_db
@@ -17,7 +12,9 @@ from datacurrent.models.entities import (
     WorkspaceMembership,
 )
 from datacurrent.schemas.queries import QueryDetail, QueryPage, QuerySummary, QueryTrendPoint
-
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import func, select, text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/workspaces/{workspace_id}/queries", tags=["queries"])
 
@@ -64,7 +61,9 @@ async def list_queries(
         "last_seen": QueryFingerprint.last_seen_at.desc(),
     }
     rows = (
-        await db.execute(base.order_by(order_map[sort]).offset((page - 1) * page_size).limit(page_size))
+        await db.execute(
+            base.order_by(order_map[sort]).offset((page - 1) * page_size).limit(page_size)
+        )
     ).all()
     items = [
         QuerySummary(
@@ -109,7 +108,11 @@ async def query_trend(
           FROM ordered ORDER BY captured_at
         """
     )
-    rows = (await db.execute(statement, {"workspace_id": workspace_id, "query_id": query_id, "since": since})).mappings()
+    rows = (
+        await db.execute(
+            statement, {"workspace_id": workspace_id, "query_id": query_id, "since": since}
+        )
+    ).mappings()
     return [QueryTrendPoint.model_validate(dict(row)) for row in rows]
 
 

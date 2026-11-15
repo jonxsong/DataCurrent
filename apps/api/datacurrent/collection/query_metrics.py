@@ -6,7 +6,6 @@ from decimal import Decimal
 from typing import Any
 
 import psycopg
-import snowflake.connector
 from psycopg.rows import dict_row
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
@@ -52,7 +51,9 @@ async def collect_postgres(config: dict[str, Any]) -> list[QueryMetric]:
          ORDER BY s.total_exec_time DESC
          LIMIT 1000
     """
-    async with await psycopg.AsyncConnection.connect(**connector._kwargs(), row_factory=dict_row) as conn:
+    async with await psycopg.AsyncConnection.connect(
+        **connector._kwargs(), row_factory=dict_row
+    ) as conn:
         rows = await (await conn.execute(query)).fetchall()
     captured_at = datetime.now(UTC)
     return [
@@ -178,7 +179,9 @@ async def persist_metrics(
 async def collect_connection_metrics(
     db: AsyncSession, connection_id: Any, *, interval_seconds: int = 60
 ) -> int:
-    connection = await db.scalar(select(DatabaseConnection).where(DatabaseConnection.id == connection_id))
+    connection = await db.scalar(
+        select(DatabaseConnection).where(DatabaseConnection.id == connection_id)
+    )
     if connection is None:
         return 0
     config = decrypt_config(connection.encrypted_config)

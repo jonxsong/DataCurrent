@@ -1,16 +1,14 @@
 import uuid
 from collections.abc import Callable
 
-from fastapi import Cookie, Depends, Header
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from datacurrent.core.database import get_db
 from datacurrent.core.errors import DataCurrentError
 from datacurrent.core.security import decode_access_token
 from datacurrent.models.entities import User, WorkspaceMembership, WorkspaceRole
-
+from fastapi import Cookie, Depends, Header
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 bearer = HTTPBearer(auto_error=False)
 
@@ -22,7 +20,9 @@ async def current_user(
 ) -> User:
     token = credentials.credentials if credentials else session_token
     if not token:
-        raise DataCurrentError("Authentication required", code="authentication_required", status_code=401)
+        raise DataCurrentError(
+            "Authentication required", code="authentication_required", status_code=401
+        )
     user_id = decode_access_token(token)
     user = await db.scalar(select(User).where(User.id == user_id, User.is_active.is_(True)))
     if not user:

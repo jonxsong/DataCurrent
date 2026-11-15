@@ -6,9 +6,7 @@ Create Date: 2026-11-15
 """
 
 from alembic import op
-
 from datacurrent.models import Base
-
 
 revision = "20261115_0001"
 down_revision = None

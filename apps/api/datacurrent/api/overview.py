@@ -1,8 +1,5 @@
 import uuid
 from datetime import UTC, datetime, timedelta
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from datacurrent.api.dependencies import workspace_membership
 from datacurrent.core.database import get_db
@@ -13,7 +10,9 @@ from datacurrent.models.entities import (
     WorkspaceMembership,
 )
 from datacurrent.schemas.queries import OverviewMetric, OverviewResponse, QuerySummary
-
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/workspaces/{workspace_id}/overview", tags=["overview"])
 
@@ -37,10 +36,12 @@ async def overview(
     latest = (
         select(
             QueryMetricSnapshot,
-            func.row_number().over(
+            func.row_number()
+            .over(
                 partition_by=QueryMetricSnapshot.query_id,
                 order_by=QueryMetricSnapshot.captured_at.desc(),
-            ).label("rank"),
+            )
+            .label("rank"),
         )
         .join(QueryFingerprint, QueryFingerprint.id == QueryMetricSnapshot.query_id)
         .join(DatabaseConnection, DatabaseConnection.id == QueryFingerprint.connection_id)
@@ -90,7 +91,11 @@ async def overview(
     limitations = [] if available else ["Historical telemetry has not been collected yet."]
     return OverviewResponse(
         time_range_hours=hours,
-        execution_count=OverviewMetric(value=count, available=available, note="Cumulative for PostgreSQL; sampled observations for Snowflake."),
+        execution_count=OverviewMetric(
+            value=count,
+            available=available,
+            note="Cumulative for PostgreSQL; sampled observations for Snowflake.",
+        ),
         mean_latency_ms=OverviewMetric(value=mean_latency, available=available),
         total_execution_time_ms=OverviewMetric(value=total_time, available=available),
         active_queries=OverviewMetric(value=active_queries, available=available),

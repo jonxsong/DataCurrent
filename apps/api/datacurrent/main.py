@@ -1,5 +1,5 @@
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 import structlog
 from fastapi import FastAPI
@@ -13,7 +13,6 @@ from datacurrent.core.database import engine
 from datacurrent.core.errors import DataCurrentError, datacurrent_error_handler
 from datacurrent.core.logging import configure_logging
 from datacurrent.middleware import RequestContextMiddleware
-
 
 settings = get_settings()
 configure_logging(settings.datacurrent_log_level)

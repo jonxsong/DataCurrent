@@ -69,7 +69,11 @@ class SnowflakeConnector(DatabaseConnector):
                 schema_name=schema,
                 name=name,
                 kind="view" if "VIEW" in table_type else "table",
-                metadata={"estimated_rows": row_count, "size_bytes": size_bytes, "catalog": catalog},
+                metadata={
+                    "estimated_rows": row_count,
+                    "size_bytes": size_bytes,
+                    "catalog": catalog,
+                },
             )
             for catalog, schema, name, table_type, row_count, size_bytes in rows
         ]

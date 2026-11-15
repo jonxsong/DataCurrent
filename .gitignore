@@ -15,5 +15,6 @@ playwright-report/
 test-results/
 *.pyc
 *.log
+*.tsbuildinfo
 .DS_Store
 

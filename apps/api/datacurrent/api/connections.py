@@ -3,10 +3,6 @@ import json
 import uuid
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from datacurrent.api.dependencies import require_role, workspace_membership
 from datacurrent.connectors import connector_for
 from datacurrent.core.crypto import decrypt_config, encrypt_config
@@ -18,8 +14,14 @@ from datacurrent.models.entities import (
     WorkspaceMembership,
     WorkspaceRole,
 )
-from datacurrent.schemas.connections import ConnectionCreate, ConnectionResponse, ConnectionTestResponse
-
+from datacurrent.schemas.connections import (
+    ConnectionCreate,
+    ConnectionResponse,
+    ConnectionTestResponse,
+)
+from fastapi import APIRouter, Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/workspaces/{workspace_id}/connections", tags=["connections"])
 
@@ -103,7 +105,9 @@ async def retest_connection(
     )
     if not connection:
         raise DataCurrentError("Connection not found", code="connection_not_found", status_code=404)
-    result = await connector_for(connection.provider, decrypt_config(connection.encrypted_config)).test()
+    result = await connector_for(
+        connection.provider, decrypt_config(connection.encrypted_config)
+    ).test()
     connection.status = ConnectionStatus.HEALTHY
     connection.last_checked_at = datetime.now(UTC)
     connection.last_error_code = None

@@ -2,9 +2,8 @@ import uuid
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, SecretStr
-
 from datacurrent.models.entities import ConnectionStatus, DatabaseProvider
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 
 class PostgreSQLConfig(BaseModel):

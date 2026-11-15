@@ -4,11 +4,9 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import jwt
-from passlib.context import CryptContext
-
 from datacurrent.core.config import get_settings
 from datacurrent.core.errors import DataCurrentError
-
+from passlib.context import CryptContext
 
 password_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
@@ -21,7 +19,9 @@ def verify_password(password: str, password_hash: str) -> bool:
     return password_context.verify(password, password_hash)
 
 
-def create_access_token(user_id: uuid.UUID, *, expires_in: timedelta = timedelta(minutes=30)) -> str:
+def create_access_token(
+    user_id: uuid.UUID, *, expires_in: timedelta = timedelta(minutes=30)
+) -> str:
     settings = get_settings()
     now = datetime.now(UTC)
     payload: dict[str, Any] = {
@@ -33,7 +33,9 @@ def create_access_token(user_id: uuid.UUID, *, expires_in: timedelta = timedelta
         "exp": now + expires_in,
         "jti": str(uuid.uuid4()),
     }
-    return jwt.encode(payload, settings.datacurrent_secret_key.get_secret_value(), algorithm="HS256")
+    return jwt.encode(
+        payload, settings.datacurrent_secret_key.get_secret_value(), algorithm="HS256"
+    )
 
 
 def decode_access_token(token: str) -> uuid.UUID:
@@ -48,7 +50,9 @@ def decode_access_token(token: str) -> uuid.UUID:
         )
         return uuid.UUID(payload["sub"])
     except (jwt.PyJWTError, KeyError, ValueError) as exc:
-        raise DataCurrentError("Invalid or expired session", code="invalid_session", status_code=401) from exc
+        raise DataCurrentError(
+            "Invalid or expired session", code="invalid_session", status_code=401
+        ) from exc
 
 
 def privacy_hash(value: str) -> str:

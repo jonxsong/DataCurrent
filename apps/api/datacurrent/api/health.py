@@ -1,13 +1,11 @@
 from datetime import UTC, datetime
 
+from datacurrent.core.config import Settings, get_settings
+from datacurrent.core.database import get_db
 from fastapi import APIRouter, Depends
 from redis.asyncio import Redis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from datacurrent.core.config import Settings, get_settings
-from datacurrent.core.database import get_db
-
 
 router = APIRouter(tags=["health"])
 

@@ -1,9 +1,5 @@
 import uuid
 
-from fastapi import APIRouter, Depends
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from datacurrent.api.dependencies import require_role
 from datacurrent.core.crypto import decrypt_config
 from datacurrent.core.database import get_db
@@ -16,7 +12,9 @@ from datacurrent.models.entities import (
 )
 from datacurrent.schemas.query_lab import AnalyzeQueryRequest, AnalyzeQueryResponse, FindingResponse
 from datacurrent.services.query_lab import explain_query
-
+from fastapi import APIRouter, Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/workspaces/{workspace_id}/query-lab", tags=["query-lab"])
 

@@ -12,12 +12,18 @@ from datacurrent.connectors.snowflake import SnowflakeConnector
 from datacurrent.models.entities import DatabaseProvider
 
 
-async def explain_postgresql(config: dict[str, Any], sql: str) -> tuple[dict[str, Any], list[Finding]]:
+async def explain_postgresql(
+    config: dict[str, Any], sql: str
+) -> tuple[dict[str, Any], list[Finding]]:
     connector = PostgreSQLConnector(config)
-    async with await psycopg.AsyncConnection.connect(**connector._kwargs(), row_factory=dict_row) as conn:
+    async with await psycopg.AsyncConnection.connect(
+        **connector._kwargs(), row_factory=dict_row
+    ) as conn:
         await conn.set_read_only(True)
         async with conn.transaction():
-            row = await (await conn.execute(f"EXPLAIN (FORMAT JSON, ANALYZE FALSE, VERBOSE TRUE) {sql}")).fetchone()
+            row = await (
+                await conn.execute(f"EXPLAIN (FORMAT JSON, ANALYZE FALSE, VERBOSE TRUE) {sql}")
+            ).fetchone()
     if not row:
         raise ValueError("PostgreSQL returned no execution plan")
     payload = next(iter(row.values()))

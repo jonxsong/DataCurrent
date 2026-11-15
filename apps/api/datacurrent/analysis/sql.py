@@ -42,7 +42,11 @@ def parse_query(sql: str, *, dialect: str = "postgres") -> ParsedQuery:
     normalized = expression.sql(dialect=dialect, pretty=True, normalize=True)
     redacted = _redact_literals(expression).sql(dialect=dialect, pretty=True, normalize=True)
     fingerprint = hashlib.sha256(redacted.encode()).hexdigest()
-    tables = tuple(sorted({table.sql(dialect=dialect, normalize=True) for table in expression.find_all(exp.Table)}))
+    tables = tuple(
+        sorted(
+            {table.sql(dialect=dialect, normalize=True) for table in expression.find_all(exp.Table)}
+        )
+    )
     return ParsedQuery(
         dialect=dialect,
         operation=operation,

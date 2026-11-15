@@ -1,9 +1,5 @@
 import uuid
 
-from fastapi import APIRouter, Depends
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from datacurrent.ai.investigator import InvestigationContext, run_investigator
 from datacurrent.api.dependencies import current_user, require_role
 from datacurrent.core.database import get_db
@@ -20,7 +16,9 @@ from datacurrent.models.entities import (
     WorkspaceRole,
 )
 from datacurrent.schemas.investigations import InvestigationRequest, InvestigationResponse
-
+from fastapi import APIRouter, Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/workspaces/{workspace_id}/investigations", tags=["investigations"])
 
@@ -109,9 +107,7 @@ async def investigate(
     record.status = "complete"
     record.summary = report.summary
     record.evidence_refs = [
-        evidence.model_dump()
-        for finding in report.findings
-        for evidence in finding.evidence
+        evidence.model_dump() for finding in report.findings for evidence in finding.evidence
     ]
     for finding in report.findings:
         if finding.recommendation:

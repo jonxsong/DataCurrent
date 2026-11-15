@@ -54,7 +54,10 @@ def _canonical_value(value: Any) -> Any:
 
 
 def digest_rows(rows: list[tuple[Any, ...]], *, ordered: bool) -> str:
-    serialized = [json.dumps([_canonical_value(value) for value in row], sort_keys=True, default=str) for row in rows]
+    serialized = [
+        json.dumps([_canonical_value(value) for value in row], sort_keys=True, default=str)
+        for row in rows
+    ]
     if ordered:
         material = json.dumps(serialized, separators=(",", ":"))
     else:
@@ -69,7 +72,9 @@ async def _measure_postgres(
     latencies: list[float] = []
     final_rows: list[tuple[Any, ...]] = []
     truncated = False
-    async with await psycopg.AsyncConnection.connect(**connector._kwargs(), row_factory=tuple_row) as conn:
+    async with await psycopg.AsyncConnection.connect(
+        **connector._kwargs(), row_factory=tuple_row
+    ) as conn:
         await conn.set_read_only(True)
         for index in range(warmups + iterations):
             started = time.perf_counter()
@@ -136,11 +141,18 @@ async def compare_queries(
     candidate = parse_query(candidate_sql, dialect=dialect)
     assert_read_only_select(original)
     assert_read_only_select(candidate)
-    ordered = "ORDER BY" in original.normalized_sql.upper() or "ORDER BY" in candidate.normalized_sql.upper()
+    ordered = (
+        "ORDER BY" in original.normalized_sql.upper()
+        or "ORDER BY" in candidate.normalized_sql.upper()
+    )
     measure = _measure_postgres if provider is DatabaseProvider.POSTGRESQL else None
     if measure:
-        original_result = await measure(config, original.normalized_sql, warmups, iterations, ordered)
-        candidate_result = await measure(config, candidate.normalized_sql, warmups, iterations, ordered)
+        original_result = await measure(
+            config, original.normalized_sql, warmups, iterations, ordered
+        )
+        candidate_result = await measure(
+            config, candidate.normalized_sql, warmups, iterations, ordered
+        )
     else:
         original_result = await asyncio.to_thread(
             _measure_snowflake_sync, config, original.normalized_sql, warmups, iterations, ordered

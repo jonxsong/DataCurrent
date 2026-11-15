@@ -29,11 +29,19 @@ class PostgreSQLConnector(DatabaseConnector):
     async def test(self) -> ConnectionTestResult:
         await validate_database_host(self.config["host"], self.config.get("port", 5432))
         started = time.perf_counter()
-        async with await psycopg.AsyncConnection.connect(**self._kwargs(), row_factory=dict_row) as conn:
+        async with await psycopg.AsyncConnection.connect(
+            **self._kwargs(), row_factory=dict_row
+        ) as conn:
             await conn.set_read_only(True)
-            row = await (await conn.execute("SELECT version() AS version, current_setting('server_version_num') AS version_num")).fetchone()
+            row = await (
+                await conn.execute(
+                    "SELECT version() AS version, current_setting('server_version_num') AS version_num"
+                )
+            ).fetchone()
             extension = await (
-                await conn.execute("SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements') AS enabled")
+                await conn.execute(
+                    "SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements') AS enabled"
+                )
             ).fetchone()
         latency = round((time.perf_counter() - started) * 1000, 2)
         pgss = bool(extension and extension["enabled"])
@@ -47,7 +55,9 @@ class PostgreSQLConnector(DatabaseConnector):
                 "catalog_discovery": True,
                 "lineage": True,
             },
-            guidance=[] if pgss else ["Install and grant access to pg_stat_statements for query metrics."],
+            guidance=[]
+            if pgss
+            else ["Install and grant access to pg_stat_statements for query metrics."],
         )
 
     async def discover(self) -> list[DiscoveredObject]:
@@ -66,7 +76,9 @@ class PostgreSQLConnector(DatabaseConnector):
                AND c.relkind IN ('r', 'p', 'v', 'm')
              ORDER BY n.nspname, c.relname
         """
-        async with await psycopg.AsyncConnection.connect(**self._kwargs(), row_factory=dict_row) as conn:
+        async with await psycopg.AsyncConnection.connect(
+            **self._kwargs(), row_factory=dict_row
+        ) as conn:
             rows = await (await conn.execute(query)).fetchall()
         return [
             DiscoveredObject(

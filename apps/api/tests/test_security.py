@@ -1,8 +1,13 @@
 import uuid
 
 import pytest
-
-from datacurrent.core.security import create_access_token, decode_access_token, hash_password, verify_password
+from datacurrent.core.errors import DataCurrentError
+from datacurrent.core.security import (
+    create_access_token,
+    decode_access_token,
+    hash_password,
+    verify_password,
+)
 
 
 def test_password_hash_round_trip() -> None:
@@ -17,5 +22,5 @@ def test_token_round_trip() -> None:
 
 
 def test_invalid_token_rejected() -> None:
-    with pytest.raises(Exception):
+    with pytest.raises(DataCurrentError):
         decode_access_token("invalid")
