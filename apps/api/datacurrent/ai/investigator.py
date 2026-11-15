@@ -2,7 +2,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
-from agents import Agent, RunContextWrapper, Runner, function_tool
+from agents import Agent, RunContextWrapper, Runner, function_tool, set_default_openai_key
 from pydantic import BaseModel, Field
 
 from datacurrent.core.config import get_settings
@@ -91,6 +91,7 @@ async def run_investigator(question: str, context: InvestigationContext) -> Inve
             code="ai_not_configured",
             status_code=503,
         )
+    set_default_openai_key(settings.openai_api_key.get_secret_value(), use_for_tracing=False)
     agent = Agent[InvestigationContext](
         name="DataCurrent Investigator",
         instructions=INSTRUCTIONS,
