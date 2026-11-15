@@ -13,7 +13,7 @@ class PostgreSQLConfig(BaseModel):
     database: str = Field(min_length=1, max_length=128)
     username: str = Field(min_length=1, max_length=128)
     password: SecretStr
-    ssl_mode: Literal["verify-full", "verify-ca", "require"] = "verify-full"
+    ssl_mode: Literal["verify-full", "verify-ca", "require", "disable"] = "verify-full"
 
 
 class SnowflakeConfig(BaseModel):
