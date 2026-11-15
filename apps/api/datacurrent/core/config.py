@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     )
     datacurrent_encryption_key: SecretStr | None = None
     datacurrent_public_url: str = "http://localhost:3000"
+    datacurrent_allow_registration: bool = True
     database_url: str = "postgresql+psycopg://datacurrent:datacurrent@localhost:5432/datacurrent"
     redis_url: str = "redis://localhost:6379/0"
     openai_api_key: SecretStr | None = None

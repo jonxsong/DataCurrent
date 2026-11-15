@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,20 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"login" | "register">("login");
+  const [registrationEnabled, setRegistrationEnabled] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    apiFetch<{ registration_enabled: boolean }>("/auth/config")
+      .then((config) => {
+        if (mounted) setRegistrationEnabled(config.registration_enabled);
+      })
+      .catch(() => {
+        if (mounted) setRegistrationEnabled(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
@@ -108,19 +122,21 @@ export default function LoginPage() {
                 </>
               )}
             </Button>
-            <Button
-              className="w-full"
-              type="button"
-              variant="secondary"
-              onClick={() => {
-                setError(null);
-                setMode(mode === "login" ? "register" : "login");
-              }}
-            >
-              {mode === "login"
-                ? "Create an account"
-                : "I already have an account"}
-            </Button>
+            {(registrationEnabled || mode === "register") && (
+              <Button
+                className="w-full"
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  setError(null);
+                  setMode(mode === "login" ? "register" : "login");
+                }}
+              >
+                {mode === "login"
+                  ? "Create an account"
+                  : "I already have an account"}
+              </Button>
+            )}
           </div>
         </form>
         <p className="mt-5 text-center text-xs text-muted-foreground">

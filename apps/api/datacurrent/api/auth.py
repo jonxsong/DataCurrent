@@ -8,6 +8,7 @@ from datacurrent.core.errors import DataCurrentError
 from datacurrent.core.security import create_access_token, hash_password, verify_password
 from datacurrent.models.entities import User, Workspace, WorkspaceMembership, WorkspaceRole
 from datacurrent.schemas.auth import (
+    AuthConfigResponse,
     LoginRequest,
     RegisterRequest,
     SessionResponse,
@@ -39,6 +40,15 @@ def set_session_cookie(response: Response, token: str, settings: Settings) -> No
     )
 
 
+def require_registration_enabled(settings: Settings) -> None:
+    if not settings.datacurrent_allow_registration:
+        raise DataCurrentError(
+            "Public registration is disabled for this deployment.",
+            code="registration_disabled",
+            status_code=403,
+        )
+
+
 async def session_payload(user: User, db: AsyncSession) -> SessionResponse:
     memberships = (
         await db.scalars(select(WorkspaceMembership).where(WorkspaceMembership.user_id == user.id))
@@ -64,6 +74,7 @@ async def register(
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ) -> SessionResponse:
+    require_registration_enabled(settings)
     user = User(
         email=payload.email.lower(),
         password_hash=hash_password(payload.password),
@@ -86,6 +97,11 @@ async def register(
     token = create_access_token(user.id)
     set_session_cookie(response, token, settings)
     return await session_payload(user, db)
+
+
+@router.get("/config", response_model=AuthConfigResponse)
+async def auth_config(settings: Settings = Depends(get_settings)) -> AuthConfigResponse:
+    return AuthConfigResponse(registration_enabled=settings.datacurrent_allow_registration)
 
 
 @router.post("/login", response_model=SessionResponse)

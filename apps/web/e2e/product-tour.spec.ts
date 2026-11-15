@@ -7,6 +7,10 @@ test("a user creates an account and enters a live-data workspace", async ({
 }) => {
   await page.route("**/api/v1/**", async (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/auth/config")) {
+      await route.fulfill({ json: { registration_enabled: true } });
+      return;
+    }
     if (path.endsWith("/auth/register") || path.endsWith("/auth/session")) {
       await route.fulfill({
         json: {
