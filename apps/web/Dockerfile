@@ -1,6 +1,6 @@
 FROM node:24-alpine AS base
-ENV PNPM_HOME="/pnpm" \
-    PATH="$PNPM_HOME:$PATH" \
+ENV PNPM_HOME="/pnpm"
+ENV PATH="${PNPM_HOME}:${PATH}" \
     NEXT_TELEMETRY_DISABLED=1
 RUN corepack enable
 
@@ -14,7 +14,9 @@ FROM dependencies AS build
 ARG NEXT_PUBLIC_API_URL=http://localhost:8000
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY tsconfig.base.json ./
-COPY apps/web apps/web
+COPY apps/web/next-env.d.ts apps/web/next.config.ts apps/web/postcss.config.mjs apps/web/tsconfig.json apps/web/
+COPY apps/web/public apps/web/public
+COPY apps/web/src apps/web/src
 RUN pnpm --filter @datacurrent/web build
 
 FROM node:24-alpine AS runtime
