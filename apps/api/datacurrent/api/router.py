@@ -5,6 +5,7 @@ from datacurrent.api.connections import router as connections_router
 from datacurrent.api.health import router as health_router
 from datacurrent.api.overview import router as overview_router
 from datacurrent.api.queries import router as queries_router
+from datacurrent.api.query_lab import router as query_lab_router
 
 
 api_router = APIRouter()
@@ -13,3 +14,4 @@ api_router.include_router(auth_router)
 api_router.include_router(connections_router)
 api_router.include_router(overview_router)
 api_router.include_router(queries_router)
+api_router.include_router(query_lab_router)
