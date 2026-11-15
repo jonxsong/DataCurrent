@@ -18,10 +18,7 @@ const Editor = dynamic(() => import("@monaco-editor/react"), {
   loading: () => <div className="grid h-[430px] place-items-center bg-[#090d0f] font-mono text-xs text-muted-foreground">Loading SQL editor…</div>,
 });
 
-const starter = `SELECT *
-FROM your_table
-WHERE created_at >= now() - interval '7 days'
-ORDER BY created_at DESC;`;
+const starter = `SELECT current_timestamp AS observed_at;`;
 
 type PlanNodeData = {
   id: string;
