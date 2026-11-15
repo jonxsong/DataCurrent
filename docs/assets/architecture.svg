@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
   <title id="title">DataCurrent system architecture</title>
-  <desc id="desc">A professional hand-drawn architecture diagram showing browser, API, metadata services, worker, PostgreSQL and Snowflake sources, Redis, OpenAI, and evidence flows.</desc>
+  <desc id="desc">A professional hand-drawn architecture diagram showing the datacurrent.jonzhang.dev public experience, API, metadata services, worker, PostgreSQL and Snowflake sources, Redis, OpenAI, and evidence flows.</desc>
   <defs>
     <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
       <path d="M 28 0 L 0 0 0 28" fill="none" stroke="#1c282b" stroke-width="1" opacity=".35"/>
@@ -22,7 +22,7 @@
   <rect width="1400" height="900" rx="22" fill="url(#grid)"/>
 
   <text x="64" y="68" class="title">DataCurrent · Evidence-first database intelligence</text>
-  <text x="64" y="94" class="subtitle">Production architecture · read-only collection · isolated verification · bounded AI reasoning</text>
+  <text x="64" y="94" class="subtitle">Application runtime blueprint · read-only collection · isolated verification · bounded AI reasoning</text>
   <g transform="translate(1195 47)">
     <path d="M0 30V17l13-6v17L0 30Z" fill="#42e5c2" opacity=".5"/>
     <path d="M18 27V9l13-6v22l-13 2Z" fill="#42e5c2" opacity=".75"/>
@@ -32,7 +32,7 @@
 
   <!-- Client boundary -->
   <path d="M47 128 Q45 126 49 124 H368 Q372 127 369 130 V778 Q367 782 363 779 H49 Q45 778 48 774 Z" fill="#0c1315" stroke="#2d3b3e" stroke-width="2" stroke-dasharray="10 7"/>
-  <text x="70" y="157" class="tiny">CLIENT</text>
+  <text x="70" y="157" class="tiny">PUBLIC EXPERIENCE · DATACURRENT.JONZHANG.DEV</text>
   <g filter="url(#shadow)">
     <path class="box" d="M78 192 Q76 188 82 187 H335 Q341 190 338 195 V369 Q336 373 331 371 H82 Q76 368 79 363 Z" rx="12"/>
     <path class="rough" d="M84 198 Q208 194 333 200"/>
@@ -159,4 +159,5 @@
     <line x1="305" y1="0" x2="359" y2="0" class="edge2"/><text x="375" y="5" class="small">Scheduled / bounded integration</text>
   </g>
   <text x="64" y="850" class="tiny">TRUST BOUNDARIES ARE EXPLICIT · CREDENTIALS NEVER ENTER MODEL CONTEXT · BENCHMARKS REQUIRE DEDICATED CONNECTIONS</text>
+  <text x="64" y="876" class="tiny">PUBLIC EDGE: PORKBUN DNS → CLOUDFLARE-BACKED SITES · APPLICATION RUNTIME: DOCKER / GCE-READY</text>
 </svg>

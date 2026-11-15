@@ -41,6 +41,8 @@ The product includes a polished landing experience, a working product workspace,
 
 The control plane never sends database credentials or arbitrary row data to the model. Database connections are encrypted at rest, collection uses read-only roles, AI receives minimized authorized evidence through narrow tools, and empirical verification requires an explicitly marked benchmark connection.
 
+The public product surface is served at **[datacurrent.jonzhang.dev](https://datacurrent.jonzhang.dev)** through Porkbun-managed authoritative DNS and the Cloudflare-backed Sites edge. The containerized application runtime is a separate deployment surface, so the public experience remains available without placing the database control plane in the request path.
+
 Read the [architecture](docs/architecture.md), [security model](docs/security.md), and [operations guide](docs/operations.md).
 
 ## Run it locally
@@ -102,7 +104,7 @@ CI runs the same Python, TypeScript, unit, browser, and image-build checks. Depe
 
 ## Production
 
-The production profile runs the real Next.js, FastAPI, Celery, PostgreSQL, and Redis services behind automatic HTTPS. See the [Google Compute Engine deployment guide](docs/production-deployment.md) for provisioning, secrets, DNS, backups, verification, and rollback.
+The public product site is live on the custom domain through the no-cost Sites edge. The production profile for the full application runs the real Next.js, FastAPI, Celery, PostgreSQL, and Redis services behind automatic HTTPS; its Google Compute Engine rollout is deployment-ready but intentionally deferred until cloud compute is desired. See the [deployment guide](docs/production-deployment.md) for provisioning, secrets, DNS, backups, verification, and rollback.
 
 ## Repository map
 

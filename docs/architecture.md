@@ -39,5 +39,15 @@ Every user-facing metadata query is scoped through a validated workspace members
 
 ## Deployment shape
 
+DataCurrent separates the public product surface from the database control plane:
+
+| Surface | Current route | Responsibility |
+|---|---|---|
+| Public product site | `datacurrent.jonzhang.dev` → Porkbun authoritative DNS → Cloudflare-backed Sites edge | Product story and interactive product experience without database credentials or source connectivity |
+| Application runtime | Docker Compose production profile; Google Compute Engine profile deployment-ready | Next.js, FastAPI, Celery worker/beat, metadata PostgreSQL, Redis, backups, and automatic HTTPS |
+| Authorized data systems | Outbound, read-only PostgreSQL and Snowflake connections | Workload statistics, plans, catalog metadata, lineage evidence, and isolated benchmarks |
+
+The public edge is active without a paid compute dependency. The full application runtime remains independently deployable and is not implied to be hosted by Porkbun or the public Sites surface. This boundary keeps marketing availability, application compute, and customer database access operationally distinct.
+
 The repository ships production images for the web and API/worker runtimes. Compose is the reproducible development and single-host deployment baseline. For a distributed deployment, run the same images behind TLS, use managed PostgreSQL and Redis, inject secrets from a secrets manager, and scale API and workers independently.
 
