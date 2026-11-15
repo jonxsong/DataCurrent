@@ -75,7 +75,7 @@ export function ProductPreview() {
                 {active}
               </h3>
             </div>
-            <Badge tone="accent">Demo telemetry</Badge>
+            <Badge tone="accent">Product preview</Badge>
           </div>
           <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border lg:grid-cols-4">
             {[

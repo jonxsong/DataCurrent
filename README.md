@@ -4,7 +4,7 @@
   <p>Detect regressions. Investigate plans. Produce bounded recommendations. Verify the outcome.</p>
 
   <p>
-    <a href="https://datacurrent.perkyaisle4.chatgpt.site"><img alt="Public demo" src="https://img.shields.io/badge/public_demo-live-42e5c2?style=for-the-badge&labelColor=11191b" /></a>
+    <a href="https://datacurrent.perkyaisle4.chatgpt.site"><img alt="Public product site" src="https://img.shields.io/badge/product_site-live-42e5c2?style=for-the-badge&labelColor=11191b" /></a>
     <a href="https://github.com/jonxsong/DataCurrent/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/jonxsong/DataCurrent/ci.yml?branch=main&style=for-the-badge&label=quality&labelColor=11191b" /></a>
     <a href="https://github.com/jonxsong/DataCurrent/actions/workflows/containers.yml"><img alt="Containers" src="https://img.shields.io/github/actions/workflow/status/jonxsong/DataCurrent/containers.yml?branch=main&style=for-the-badge&label=containers&labelColor=11191b" /></a>
   </p>
@@ -22,7 +22,7 @@ Database performance tools often stop at a chart, and AI tools often start guess
 
 The product includes a polished landing experience, a working product workspace, production APIs, scheduled collectors, and a reproducible commerce workload. PostgreSQL and Snowflake are first-class providers—not visual placeholders.
 
-**[Explore the public product demo →](https://datacurrent.perkyaisle4.chatgpt.site)**
+**[Visit the public product site →](https://datacurrent.perkyaisle4.chatgpt.site)**
 
 ## Product surfaces
 
