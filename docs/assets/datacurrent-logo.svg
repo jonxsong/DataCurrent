@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="80" viewBox="0 0 360 80" role="img" aria-labelledby="title desc">
+  <title id="title">DataCurrent</title>
+  <desc id="desc">Three ascending current bars beside the DataCurrent wordmark</desc>
+  <rect width="360" height="80" rx="12" fill="#080c0e"/>
+  <g transform="translate(22 18)">
+    <path d="M0 38V25l9-4v15l-9 2Z" fill="#42e5c2" opacity=".55"/>
+    <path d="M14 35V14l9-4v23l-9 2Z" fill="#42e5c2" opacity=".8"/>
+    <path d="M28 32V4l9-4v30l-9 2Z" fill="#42e5c2"/>
+  </g>
+  <text x="78" y="49" fill="#ecf4f2" font-family="Manrope,Segoe UI,sans-serif" font-size="30" font-weight="700" letter-spacing="-1.2">DataCurrent</text>
+</svg>
