@@ -48,8 +48,8 @@ export default function LandingPage() {
           </a>
         </div>
         <Button asChild size="sm">
-          <Link href="/app/demo/overview">
-            Launch demo <ArrowRight className="size-3.5" />
+          <Link href="/login">
+            Launch DataCurrent <ArrowRight className="size-3.5" />
           </Link>
         </Button>
       </nav>
@@ -71,8 +71,8 @@ export default function LandingPage() {
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Button asChild size="lg">
-              <Link href="/app/demo/overview">
-                Explore the working demo <ArrowRight className="size-4" />
+              <Link href="/login">
+                Open the application <ArrowRight className="size-4" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
@@ -86,8 +86,8 @@ export default function LandingPage() {
       <section className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
         <ProductPreview />
         <p className="mt-3 text-right font-mono text-[9px] text-muted-foreground">
-          Illustrative landing preview · the in-app demo uses reproducible
-          database data
+          Product workflow · in-app metrics come from collected database
+          evidence
         </p>
       </section>
       <section id="workflow" className="border-y border-border">

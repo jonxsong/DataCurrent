@@ -10,14 +10,16 @@ import {
   YAxis,
 } from "recharts";
 
-import { latencySeries } from "@/lib/demo-data";
-
-export function LatencyChart() {
+export function LatencyChart({
+  data,
+}: {
+  data: Array<{ time: string; mean: number; p95: number }>;
+}) {
   return (
     <div className="h-72">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
-          data={latencySeries}
+          data={data}
           margin={{ left: -18, right: 4, top: 12, bottom: 0 }}
         >
           <defs>

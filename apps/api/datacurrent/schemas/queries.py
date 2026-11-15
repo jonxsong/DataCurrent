@@ -49,12 +49,19 @@ class OverviewMetric(BaseModel):
     note: str | None = None
 
 
+class OverviewTrendPoint(BaseModel):
+    captured_at: datetime
+    mean_time_ms: Decimal
+    p95_time_ms: Decimal
+
+
 class OverviewResponse(BaseModel):
     time_range_hours: int
     execution_count: OverviewMetric
     mean_latency_ms: OverviewMetric
     total_execution_time_ms: OverviewMetric
     active_queries: OverviewMetric
+    latency_series: list[OverviewTrendPoint] = Field(default_factory=list)
     recent_regressions: list[dict[str, object]] = Field(default_factory=list)
     slowest_queries: list[QuerySummary] = Field(default_factory=list)
     data_freshness: datetime | None

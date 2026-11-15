@@ -27,7 +27,15 @@ const navigation = [
   ["Settings", "settings", Settings],
 ] as const;
 
-export function AppSidebar({ workspace }: { workspace: string }) {
+export function AppSidebar({
+  workspace,
+  workspaceName,
+  user,
+}: {
+  workspace: string;
+  workspaceName: string;
+  user: { display_name: string; email: string };
+}) {
   const pathname = usePathname();
   return (
     <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 border-r border-border bg-[#090d0f] lg:flex lg:flex-col">
@@ -44,7 +52,7 @@ export function AppSidebar({ workspace }: { workspace: string }) {
           <span className="grid size-6 place-items-center rounded bg-accent/10 font-mono text-[9px] text-accent">
             DC
           </span>
-          <span>{workspace === "demo" ? "Demo workspace" : "Production"}</span>
+          <span className="truncate">{workspaceName}</span>
         </div>
       </div>
       <nav className="flex-1 space-y-1 px-3">
@@ -69,12 +77,17 @@ export function AppSidebar({ workspace }: { workspace: string }) {
       <div className="border-t border-border p-4">
         <div className="flex items-center gap-3">
           <span className="grid size-8 place-items-center rounded-full bg-elevated text-xs font-semibold">
-            DZ
+            {user.display_name
+              .split(/\s+/)
+              .map((part) => part[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase()}
           </span>
           <div>
-            <p className="text-xs font-medium">Demo operator</p>
+            <p className="max-w-36 truncate text-xs font-medium">{user.display_name}</p>
             <p className="font-mono text-[9px] text-muted-foreground">
-              workspace owner
+              {user.email}
             </p>
           </div>
         </div>

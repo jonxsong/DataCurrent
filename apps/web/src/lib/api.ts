@@ -22,11 +22,15 @@ export async function apiFetch<T>(
   if (!response.ok) {
     const payload = (await response.json().catch(() => null)) as {
       error?: { code?: string; message?: string };
+      detail?: string | Array<{ msg?: string }>;
     } | null;
+    const detail = Array.isArray(payload?.detail)
+      ? payload.detail.map((item) => item.msg).filter(Boolean).join("; ")
+      : payload?.detail;
     throw new ApiError(
       response.status,
       payload?.error?.code ?? "request_failed",
-      payload?.error?.message ?? "Request failed",
+      payload?.error?.message ?? detail ?? "Request failed",
     );
   }
   if (response.status === 204) return undefined as T;

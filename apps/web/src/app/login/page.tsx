@@ -13,6 +13,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<"login" | "register">("login");
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
@@ -20,13 +21,22 @@ export default function LoginPage() {
     const form = new FormData(event.currentTarget);
     try {
       const session = await apiFetch<{ workspaces: Array<{ id: string }> }>(
-        `/auth/login`,
+        `/auth/${mode === "login" ? "login" : "register"}`,
         {
           method: "POST",
-          body: JSON.stringify({
-            email: form.get("email"),
-            password: form.get("password"),
-          }),
+          body: JSON.stringify(
+            mode === "login"
+              ? {
+                  email: form.get("email"),
+                  password: form.get("password"),
+                }
+              : {
+                  email: form.get("email"),
+                  password: form.get("password"),
+                  display_name: form.get("display_name"),
+                  workspace_name: form.get("workspace_name"),
+                },
+          ),
         },
       );
       router.push(`/app/${session.workspaces[0]?.id}/overview`);
@@ -46,11 +56,30 @@ export default function LoginPage() {
           onSubmit={submit}
           className="rounded-xl border border-border bg-surface p-6 shadow-2xl"
         >
-          <h1 className="text-2xl font-semibold tracking-[-.04em]">Sign in</h1>
+          <h1 className="text-2xl font-semibold tracking-[-.04em]">
+            {mode === "login" ? "Sign in" : "Create your workspace"}
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Continue to your database intelligence workspace.
+            {mode === "login"
+              ? "Continue to your database intelligence workspace."
+              : "Start securely, then connect PostgreSQL or Snowflake."}
           </p>
           <div className="mt-7 space-y-4">
+            {mode === "register" && (
+              <>
+                <AuthField
+                  label="Your name"
+                  name="display_name"
+                  autoComplete="name"
+                  required
+                />
+                <AuthField
+                  label="Workspace name"
+                  name="workspace_name"
+                  required
+                />
+              </>
+            )}
             <AuthField
               label="Email"
               name="email"
@@ -62,34 +91,41 @@ export default function LoginPage() {
               label="Password"
               name="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete={
+                mode === "login" ? "current-password" : "new-password"
+              }
+              minLength={mode === "register" ? 12 : undefined}
               required
             />
             {error && <p className="text-xs text-danger">{error}</p>}
             <Button className="w-full" type="submit" disabled={loading}>
               {loading ? (
-                "Signing in…"
+                mode === "login" ? "Signing in…" : "Creating workspace…"
               ) : (
                 <>
-                  Sign in <ArrowRight className="size-4" />
+                  {mode === "login" ? "Sign in" : "Create workspace"}{" "}
+                  <ArrowRight className="size-4" />
                 </>
               )}
             </Button>
             <Button
-              asChild
               className="w-full"
               type="button"
               variant="secondary"
+              onClick={() => {
+                setError(null);
+                setMode(mode === "login" ? "register" : "login");
+              }}
             >
-              <Link href="/app/demo/overview">
-                Explore demo without account
-              </Link>
+              {mode === "login"
+                ? "Create an account"
+                : "I already have an account"}
             </Button>
           </div>
         </form>
         <p className="mt-5 text-center text-xs text-muted-foreground">
-          New workspace registration is available through the API during this
-          preview.
+          Sessions are HTTP-only; database secrets are never returned to the
+          browser.
         </p>
       </div>
     </main>

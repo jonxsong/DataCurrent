@@ -9,7 +9,12 @@ from datacurrent.models.entities import (
     QueryMetricSnapshot,
     WorkspaceMembership,
 )
-from datacurrent.schemas.queries import OverviewMetric, OverviewResponse, QuerySummary
+from datacurrent.schemas.queries import (
+    OverviewMetric,
+    OverviewResponse,
+    OverviewTrendPoint,
+    QuerySummary,
+)
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -69,6 +74,30 @@ async def overview(
             .limit(5)
         )
     ).all()
+    trend_filters = [
+        QueryMetricSnapshot.workspace_id == workspace_id,
+        QueryMetricSnapshot.captured_at >= since,
+        DatabaseConnection.workspace_id == workspace_id,
+    ]
+    if connection_id:
+        trend_filters.append(DatabaseConnection.id == connection_id)
+    bucket = func.date_trunc("hour", QueryMetricSnapshot.captured_at)
+    trend_rows = (
+        await db.execute(
+            select(
+                bucket.label("captured_at"),
+                func.avg(QueryMetricSnapshot.mean_time_ms).label("mean_time_ms"),
+                func.percentile_cont(0.95)
+                .within_group(QueryMetricSnapshot.mean_time_ms)
+                .label("p95_time_ms"),
+            )
+            .join(QueryFingerprint, QueryFingerprint.id == QueryMetricSnapshot.query_id)
+            .join(DatabaseConnection, DatabaseConnection.id == QueryFingerprint.connection_id)
+            .where(*trend_filters)
+            .group_by(bucket)
+            .order_by(bucket)
+        )
+    ).all()
     slowest = [
         QuerySummary(
             id=row.QueryFingerprint.id,
@@ -99,6 +128,14 @@ async def overview(
         mean_latency_ms=OverviewMetric(value=mean_latency, available=available),
         total_execution_time_ms=OverviewMetric(value=total_time, available=available),
         active_queries=OverviewMetric(value=active_queries, available=available),
+        latency_series=[
+            OverviewTrendPoint(
+                captured_at=row.captured_at,
+                mean_time_ms=row.mean_time_ms,
+                p95_time_ms=row.p95_time_ms,
+            )
+            for row in trend_rows
+        ],
         slowest_queries=slowest,
         data_freshness=freshness,
         limitations=limitations,
