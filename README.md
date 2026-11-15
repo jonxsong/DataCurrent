@@ -100,13 +100,18 @@ pnpm --filter @datacurrent/web test:e2e
 
 CI runs the same Python, TypeScript, unit, browser, and image-build checks. Dependabot maintains npm, uv, Docker, and GitHub Actions dependencies.
 
+## Production
+
+The production profile runs the real Next.js, FastAPI, Celery, PostgreSQL, and Redis services behind automatic HTTPS. See the [Google Compute Engine deployment guide](docs/production-deployment.md) for provisioning, secrets, DNS, backups, verification, and rollback.
+
 ## Repository map
 
 ```text
 apps/api/                 FastAPI control plane, connectors, analysis, AI, migrations
 apps/web/                 Next.js landing page and application workspace
 workers/collector/        Celery collection, retention, and regression jobs
-infrastructure/docker/    Reproducible PostgreSQL demo environment
+infrastructure/docker/    Reproducible PostgreSQL development environment
+infrastructure/deployment/ Hardened HTTPS production deployment
 benchmarks/scenarios/     Deterministic workload investigations
 docs/                     Architecture, security, Snowflake, and operations
 site-preview/             Public .chatgpt.site source package

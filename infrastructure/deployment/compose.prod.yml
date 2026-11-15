@@ -1,0 +1,185 @@
+name: datacurrent-production
+
+x-api-environment: &api-environment
+  DATACURRENT_ENV: production
+  DATACURRENT_LOG_LEVEL: INFO
+  DATACURRENT_SECRET_KEY: ${DATACURRENT_SECRET_KEY:?DATACURRENT_SECRET_KEY is required}
+  DATACURRENT_ENCRYPTION_KEY: ${DATACURRENT_ENCRYPTION_KEY:?DATACURRENT_ENCRYPTION_KEY is required}
+  DATACURRENT_PUBLIC_URL: https://${DATACURRENT_DOMAIN:?DATACURRENT_DOMAIN is required}
+  DATACURRENT_ALLOW_REGISTRATION: ${DATACURRENT_ALLOW_REGISTRATION:-false}
+  DATABASE_URL: postgresql+psycopg://datacurrent:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/datacurrent
+  REDIS_URL: redis://redis:6379/0
+  OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required}
+  OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5-mini}
+  CORS_ORIGINS: '["https://${DATACURRENT_DOMAIN}"]'
+  DATABASE_HOST_ALLOWLIST: '[]'
+  ALLOW_PRIVATE_DATABASE_HOSTS: "false"
+
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL is required}
+      DATACURRENT_DOMAIN: ${DATACURRENT_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+
+  web:
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://${DATACURRENT_DOMAIN}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: https://${DATACURRENT_DOMAIN}
+    expose:
+      - "3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+    security_opt:
+      - no-new-privileges:true
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: datacurrent
+      POSTGRES_USER: datacurrent
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U datacurrent -d datacurrent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    security_opt:
+      - no-new-privileges:true
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    security_opt:
+      - no-new-privileges:true
+
+  migrate:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    command: ["alembic", "upgrade", "head"]
+    environment: *api-environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    security_opt:
+      - no-new-privileges:true
+
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment: *api-environment
+    expose:
+      - "8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8000/api/v1/readyz"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+    security_opt:
+      - no-new-privileges:true
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    command: ["celery", "-A", "collector.celery_app:app", "worker", "--loglevel=INFO", "--concurrency=2"]
+    restart: unless-stopped
+    environment: *api-environment
+    depends_on:
+      api:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+
+  beat:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    command: ["celery", "-A", "collector.celery_app:app", "beat", "--loglevel=INFO"]
+    restart: unless-stopped
+    environment: *api-environment
+    depends_on:
+      api:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      PGHOST: postgres
+      PGDATABASE: datacurrent
+      PGUSER: datacurrent
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        while true; do
+          pg_dump --format=custom --file="/backups/datacurrent_$$(date -u +%Y%m%dT%H%M%SZ).dump"
+          find /backups -type f -name 'datacurrent_*.dump' -mtime +14 -delete
+          sleep 86400
+        done
+    volumes:
+      - postgres-backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  caddy-data:
+  caddy-config:
+  postgres-data:
+  postgres-backups:
+  redis-data:

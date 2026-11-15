@@ -1,6 +1,7 @@
 .env
 .env.*
 !.env.example
+!infrastructure/deployment/.env.production.example
 node_modules/
 .next/
 dist/
