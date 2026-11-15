@@ -4,6 +4,8 @@
 node_modules/
 .next/
 dist/
+!site-preview/dist/
+!site-preview/dist/**
 .venv/
 __pycache__/
 .pytest_cache/
