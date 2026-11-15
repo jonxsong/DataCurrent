@@ -15,12 +15,34 @@ from datacurrent.models.entities import (
     WorkspaceMembership,
     WorkspaceRole,
 )
-from datacurrent.schemas.investigations import InvestigationRequest, InvestigationResponse
+from datacurrent.schemas.investigations import (
+    InvestigationRequest,
+    InvestigationResponse,
+    InvestigationSummary,
+)
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/workspaces/{workspace_id}/investigations", tags=["investigations"])
+
+
+@router.get("", response_model=list[InvestigationSummary])
+async def list_investigations(
+    workspace_id: uuid.UUID,
+    _membership: WorkspaceMembership = Depends(require_role(WorkspaceRole.VIEWER)),
+    db: AsyncSession = Depends(get_db),
+) -> list[Investigation]:
+    return list(
+        (
+            await db.scalars(
+                select(Investigation)
+                .where(Investigation.workspace_id == workspace_id)
+                .order_by(Investigation.created_at.desc())
+                .limit(50)
+            )
+        ).all()
+    )
 
 
 @router.post("", response_model=InvestigationResponse, status_code=201)

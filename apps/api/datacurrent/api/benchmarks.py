@@ -11,13 +11,64 @@ from datacurrent.models.entities import (
     WorkspaceMembership,
     WorkspaceRole,
 )
-from datacurrent.schemas.benchmarks import BenchmarkRequest, BenchmarkResponse, MeasurementResponse
+from datacurrent.schemas.benchmarks import (
+    BenchmarkRequest,
+    BenchmarkResponse,
+    BenchmarkRunSummary,
+    MeasurementResponse,
+)
 from datacurrent.verification.benchmark import compare_queries
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/workspaces/{workspace_id}/benchmarks", tags=["benchmarks"])
+
+
+@router.get("", response_model=list[BenchmarkRunSummary])
+async def list_benchmarks(
+    workspace_id: uuid.UUID,
+    _membership: WorkspaceMembership = Depends(require_role(WorkspaceRole.VIEWER)),
+    db: AsyncSession = Depends(get_db),
+) -> list[BenchmarkRunSummary]:
+    rows = list(
+        (
+            await db.scalars(
+                select(BenchmarkRun)
+                .where(BenchmarkRun.workspace_id == workspace_id)
+                .order_by(BenchmarkRun.created_at.desc())
+                .limit(50)
+            )
+        ).all()
+    )
+    return [
+        BenchmarkRunSummary(
+            id=row.id,
+            connection_id=row.connection_id,
+            status=row.status,
+            original_sql=row.original_sql,
+            candidate_sql=row.candidate_sql,
+            original_median_ms=row.original_median_ms,
+            candidate_median_ms=row.candidate_median_ms,
+            original_p95_ms=row.original_p95_ms,
+            candidate_p95_ms=row.candidate_p95_ms,
+            speedup_ratio=(
+                float(row.original_median_ms / row.candidate_median_ms)
+                if row.original_median_ms is not None
+                and row.candidate_median_ms is not None
+                and row.candidate_median_ms > 0
+                else None
+            ),
+            result_agreement=row.result_agreement,
+            warmup_iterations=row.warmup_iterations,
+            measured_iterations=row.measured_iterations,
+            environment=row.environment,
+            methodology=row.methodology,
+            caveats=row.raw_measurements.get("caveats", []),
+            created_at=row.created_at,
+        )
+        for row in rows
+    ]
 
 
 @router.post("", response_model=BenchmarkResponse, status_code=201)

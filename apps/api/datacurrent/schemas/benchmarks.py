@@ -1,4 +1,6 @@
 import uuid
+from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, Field
 
@@ -28,3 +30,23 @@ class BenchmarkResponse(BaseModel):
     speedup_ratio: float
     result_agreement: str
     caveats: list[str]
+
+
+class BenchmarkRunSummary(BaseModel):
+    id: uuid.UUID
+    connection_id: uuid.UUID
+    status: str
+    original_sql: str
+    candidate_sql: str
+    original_median_ms: Decimal | None
+    candidate_median_ms: Decimal | None
+    original_p95_ms: Decimal | None
+    candidate_p95_ms: Decimal | None
+    speedup_ratio: float | None
+    result_agreement: str | None
+    warmup_iterations: int
+    measured_iterations: int
+    environment: dict[str, object]
+    methodology: dict[str, object]
+    caveats: list[str]
+    created_at: datetime

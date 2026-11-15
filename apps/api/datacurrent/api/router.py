@@ -7,11 +7,13 @@ from datacurrent.api.lineage import router as lineage_router
 from datacurrent.api.overview import router as overview_router
 from datacurrent.api.queries import router as queries_router
 from datacurrent.api.query_lab import router as query_lab_router
+from datacurrent.api.workspaces import router as workspaces_router
 from fastapi import APIRouter
 
 api_router = APIRouter()
 api_router.include_router(health_router)
 api_router.include_router(auth_router)
+api_router.include_router(workspaces_router)
 api_router.include_router(connections_router)
 api_router.include_router(overview_router)
 api_router.include_router(queries_router)
