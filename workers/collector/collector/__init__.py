@@ -1,0 +1,1 @@
+"""DataCurrent metric collector worker."""
