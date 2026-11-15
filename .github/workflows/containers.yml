@@ -1,0 +1,36 @@
+name: Containers
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/**"
+      - "workers/**"
+      - "infrastructure/**"
+      - "docker-compose.yml"
+      - "uv.lock"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/containers.yml"
+  pull_request:
+    paths:
+      - "apps/**"
+      - "workers/**"
+      - "infrastructure/**"
+      - "docker-compose.yml"
+      - "uv.lock"
+      - "pnpm-lock.yaml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build production images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate Compose
+        run: docker compose config --quiet
+      - name: Build images
+        run: docker compose build api web demo-postgres
+
