@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import ORJSONResponse
 
 from datacurrent import __version__
 from datacurrent.api.router import api_router
@@ -32,7 +31,6 @@ app = FastAPI(
     description="Evidence-backed PostgreSQL and Snowflake intelligence.",
     version=__version__,
     lifespan=lifespan,
-    default_response_class=ORJSONResponse,
     docs_url="/docs" if not settings.is_production else None,
     redoc_url=None,
 )
