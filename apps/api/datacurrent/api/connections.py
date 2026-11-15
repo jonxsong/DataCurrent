@@ -79,6 +79,7 @@ async def create_connection(
         config_fingerprint=hashlib.sha256(canonical.encode()).hexdigest(),
         capabilities=result.capabilities,
         tls_verify=raw.get("ssl_mode", "verify-full") != "require",
+        benchmark_only=payload.benchmark_only,
         last_checked_at=datetime.now(UTC),
     )
     db.add(connection)

@@ -34,6 +34,7 @@ ConnectionConfig = Annotated[PostgreSQLConfig | SnowflakeConfig, Field(discrimin
 class ConnectionCreate(BaseModel):
     name: str = Field(min_length=2, max_length=120)
     config: ConnectionConfig
+    benchmark_only: bool = False
 
 
 class ConnectionResponse(BaseModel):
@@ -45,6 +46,7 @@ class ConnectionResponse(BaseModel):
     capabilities: dict[str, object]
     tls_verify: bool
     collect_enabled: bool
+    benchmark_only: bool
     last_checked_at: datetime | None
     last_collected_at: datetime | None
     last_error_code: str | None
