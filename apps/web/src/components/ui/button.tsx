@@ -10,26 +10,41 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-accent text-accent-foreground hover:bg-accent/90",
-        secondary: "border border-border bg-surface text-foreground hover:bg-elevated",
+        secondary:
+          "border border-border bg-surface text-foreground hover:bg-elevated",
         ghost: "text-muted-foreground hover:bg-elevated hover:text-foreground",
-        danger: "bg-danger/15 text-danger hover:bg-danger/25"
+        danger: "bg-danger/15 text-danger hover:bg-danger/25",
       },
       size: {
         default: "h-9 px-4",
         sm: "h-8 rounded px-3 text-xs",
         lg: "h-11 px-6",
-        icon: "size-9"
-      }
+        icon: "size-9",
+      },
     },
-    defaultVariants: { variant: "default", size: "default" }
-  }
+    defaultVariants: { variant: "default", size: "default" },
+  },
 );
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+export interface ButtonProps
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
-export function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
+export function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}: ButtonProps) {
   const Component = asChild ? Slot : "button";
-  return <Component className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+  return (
+    <Component
+      className={cn(buttonVariants({ variant, size }), className)}
+      {...props}
+    />
+  );
 }
