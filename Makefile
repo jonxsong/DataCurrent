@@ -32,7 +32,7 @@ migrate:
 	docker compose run --rm api alembic upgrade head
 
 seed:
-	docker compose run --rm demo-seed
+	docker compose up -d --build demo-postgres
 
 logs:
 	docker compose logs -f --tail=200
