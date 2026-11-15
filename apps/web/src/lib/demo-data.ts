@@ -1,0 +1,29 @@
+export const demoMetrics = {
+  executions: 2484192,
+  meanLatency: 42.8,
+  totalTime: 106326.4,
+  activeQueries: 184,
+  dataFreshness: new Date().toISOString()
+};
+
+export const latencySeries = [
+  { time: "00:00", mean: 31, p95: 82 }, { time: "03:00", mean: 34, p95: 94 },
+  { time: "06:00", mean: 38, p95: 101 }, { time: "09:00", mean: 46, p95: 136 },
+  { time: "12:00", mean: 41, p95: 118 }, { time: "15:00", mean: 49, p95: 161 },
+  { time: "18:00", mean: 58, p95: 194 }, { time: "21:00", mean: 47, p95: 168 },
+  { time: "Now", mean: 43, p95: 152 }
+];
+
+export const demoQueries = [
+  { id: "q-orders-date", provider: "PostgreSQL", operation: "SELECT", sql: "SELECT id, customer_id, total_amount FROM orders WHERE created_at >= now() - interval $1 ORDER BY created_at DESC", calls: 48218, mean: 842.4, total: 40618483, rows: 8421900, change: 62 },
+  { id: "q-events", provider: "Snowflake", operation: "SELECT", sql: "SELECT event_type, COUNT(*) FROM analytics.events WHERE occurred_at >= ? GROUP BY event_type", calls: 12842, mean: 318.1, total: 4085010, rows: 4200000, change: -14 },
+  { id: "q-customer-ltv", provider: "PostgreSQL", operation: "SELECT", sql: "SELECT c.id, (SELECT sum(o.total_amount) FROM orders o WHERE o.customer_id = c.id) FROM customers c", calls: 7184, mean: 146.2, total: 1050301, rows: 25000, change: 3 },
+  { id: "q-inventory", provider: "PostgreSQL", operation: "SELECT", sql: "SELECT DISTINCT p.id, p.name, i.quantity_on_hand FROM products p JOIN inventory i ON i.product_id = p.id JOIN order_items oi ON oi.product_id = p.id", calls: 3291, mean: 91.7, total: 301755, rows: 382, change: -7 },
+  { id: "q-revenue", provider: "Snowflake", operation: "SELECT", sql: "SELECT DATE_TRUNC('day', created_at), SUM(total_amount) FROM orders GROUP BY 1", calls: 882, mean: 73.4, total: 64739, rows: 365, change: 1 }
+];
+
+export const demoPlan = {
+  id: "0", nodeType: "Sort", cost: 284901, rows: 8421900, children: [
+    { id: "0.0", nodeType: "Seq Scan", relation: "orders", cost: 256118, rows: 8421900, filter: "created_at >= now() - '7 days'::interval", severity: "high" }
+  ]
+};
