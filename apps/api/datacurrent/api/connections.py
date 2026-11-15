@@ -132,6 +132,27 @@ async def retest_connection(
     return result
 
 
+@router.post("/{connection_id}/collect", status_code=202)
+async def collect_now(
+    workspace_id: uuid.UUID,
+    connection_id: uuid.UUID,
+    _membership: WorkspaceMembership = Depends(require_role(WorkspaceRole.MEMBER)),
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, object]:
+    connection = await db.scalar(
+        select(DatabaseConnection).where(
+            DatabaseConnection.id == connection_id,
+            DatabaseConnection.workspace_id == workspace_id,
+        )
+    )
+    if not connection:
+        raise DataCurrentError("Connection not found", code="connection_not_found", status_code=404)
+    from collector.celery_app import collect_connection
+
+    task = collect_connection.delay(str(connection.id))
+    return {"queued": True, "task_id": task.id}
+
+
 @router.delete("/{connection_id}", status_code=204)
 async def delete_connection(
     workspace_id: uuid.UUID,

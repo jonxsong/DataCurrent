@@ -14,7 +14,11 @@ export default async function QueryLabPage({
         title="Query Lab"
         description="Inspect structured execution plans and deterministic findings. DataCurrent never runs EXPLAIN ANALYZE automatically."
       />
-      <QueryLabWorkspace workspace={workspace} />
+      <Suspense fallback={<p className="font-mono text-xs text-muted-foreground">Loading Query Lab…</p>}>
+        <QueryLabWorkspace workspace={workspace} />
+      </Suspense>
     </>
   );
 }
+import { Suspense } from "react";
+

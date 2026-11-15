@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 class AnalyzeQueryRequest(BaseModel):
     connection_id: uuid.UUID
+    query_id: uuid.UUID | None = None
     sql: str = Field(min_length=1, max_length=200_000)
 
 

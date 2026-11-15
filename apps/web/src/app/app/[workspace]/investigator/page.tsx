@@ -14,7 +14,11 @@ export default async function InvestigatorPage({
         title="AI Investigator"
         description="Ask performance questions grounded in authorized query, plan, metric, schema, and lineage evidence."
       />
-      <InvestigatorWorkspace workspace={workspace} />
+      <Suspense fallback={<p className="font-mono text-xs text-muted-foreground">Loading investigator…</p>}>
+        <InvestigatorWorkspace workspace={workspace} />
+      </Suspense>
     </>
   );
 }
+import { Suspense } from "react";
+

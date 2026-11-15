@@ -5,6 +5,10 @@ from datacurrent.api.dependencies import current_user, require_role
 from datacurrent.core.database import get_db
 from datacurrent.core.errors import DataCurrentError
 from datacurrent.models.entities import (
+    CatalogColumn,
+    CatalogIndex,
+    CatalogSchema,
+    CatalogTable,
     EvidenceKind,
     ExecutionPlan,
     Investigation,
@@ -77,6 +81,8 @@ async def investigate(
         if not plan:
             raise DataCurrentError("Plan not found", code="plan_not_found", status_code=404)
     metric_rows = []
+    schema_rows: list[dict[str, object]] = []
+    index_rows: list[dict[str, object]] = []
     if query:
         metrics = (
             await db.scalars(
@@ -100,6 +106,72 @@ async def investigate(
             }
             for metric in metrics
         ]
+        object_names = {name.rsplit(".", 1)[-1].strip('"') for name in query.referenced_objects}
+        if object_names:
+            catalog_rows = (
+                await db.execute(
+                    select(CatalogTable, CatalogSchema)
+                    .join(CatalogSchema, CatalogSchema.id == CatalogTable.schema_id)
+                    .where(
+                        CatalogSchema.connection_id == query.connection_id,
+                        CatalogTable.name.in_(object_names),
+                    )
+                )
+            ).all()
+            table_ids = [table.id for table, _schema in catalog_rows]
+            columns = (
+                (
+                    await db.scalars(
+                        select(CatalogColumn)
+                        .where(CatalogColumn.table_id.in_(table_ids))
+                        .order_by(CatalogColumn.table_id, CatalogColumn.ordinal_position)
+                    )
+                ).all()
+                if table_ids
+                else []
+            )
+            columns_by_table: dict[uuid.UUID, list[dict[str, object]]] = {}
+            for column in columns:
+                columns_by_table.setdefault(column.table_id, []).append(
+                    {
+                        "name": column.name,
+                        "data_type": column.data_type,
+                        "nullable": column.nullable,
+                        "primary_key": column.is_primary_key,
+                    }
+                )
+            schema_rows = [
+                {
+                    "source_id": str(table.id),
+                    "name": f"{schema.name}.{table.name}",
+                    "kind": table.kind,
+                    "estimated_rows": table.estimated_rows,
+                    "size_bytes": table.size_bytes,
+                    "columns": columns_by_table.get(table.id, []),
+                }
+                for table, schema in catalog_rows
+            ]
+            indexes = (
+                (
+                    await db.scalars(
+                        select(CatalogIndex).where(CatalogIndex.table_id.in_(table_ids))
+                    )
+                ).all()
+                if table_ids
+                else []
+            )
+            index_rows = [
+                {
+                    "source_id": str(index.id),
+                    "table_id": str(index.table_id),
+                    "name": index.name,
+                    "definition": index.definition,
+                    "columns": index.column_names,
+                    "unique": index.is_unique,
+                    "scan_count": index.scan_count,
+                }
+                for index in indexes
+            ]
     context = InvestigationContext(
         query={
             "source_id": str(query.id) if query else None,
@@ -113,6 +185,8 @@ async def investigate(
             "heuristics": plan.heuristics if plan else [],
         },
         metrics=metric_rows,
+        schema=schema_rows,
+        indexes=index_rows,
     )
     record = Investigation(
         workspace_id=workspace_id,

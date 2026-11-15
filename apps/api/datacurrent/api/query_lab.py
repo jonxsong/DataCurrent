@@ -7,6 +7,8 @@ from datacurrent.core.errors import DataCurrentError
 from datacurrent.models.entities import (
     DatabaseConnection,
     ExecutionPlan,
+    QueryFingerprint,
+    QueryMetricSnapshot,
     WorkspaceMembership,
     WorkspaceRole,
 )
@@ -34,6 +36,19 @@ async def analyze_query(
     )
     if not connection:
         raise DataCurrentError("Connection not found", code="connection_not_found", status_code=404)
+    if payload.query_id:
+        query = await db.scalar(
+            select(QueryFingerprint)
+            .join(QueryMetricSnapshot, QueryMetricSnapshot.query_id == QueryFingerprint.id)
+            .where(
+                QueryFingerprint.id == payload.query_id,
+                QueryFingerprint.connection_id == connection.id,
+                QueryMetricSnapshot.workspace_id == workspace_id,
+            )
+            .limit(1)
+        )
+        if not query:
+            raise DataCurrentError("Query not found", code="query_not_found", status_code=404)
     parsed, plan_payload, findings = await explain_query(
         connection.provider,
         decrypt_config(connection.encrypted_config),
@@ -41,6 +56,7 @@ async def analyze_query(
     )
     plan = ExecutionPlan(
         workspace_id=workspace_id,
+        query_id=payload.query_id,
         provider=connection.provider,
         plan_json=plan_payload["raw"],
         analyzed=False,

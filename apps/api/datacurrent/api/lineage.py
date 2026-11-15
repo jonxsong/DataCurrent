@@ -3,7 +3,7 @@ import uuid
 from datacurrent.api.dependencies import require_role, workspace_membership
 from datacurrent.core.database import get_db
 from datacurrent.core.errors import DataCurrentError
-from datacurrent.lineage import sync_catalog, sync_dependencies
+from datacurrent.lineage import sync_catalog, sync_catalog_details, sync_dependencies
 from datacurrent.models.entities import (
     DatabaseConnection,
     LineageEdge,
@@ -40,6 +40,7 @@ async def sync_lineage(
     if not connection:
         raise DataCurrentError("Connection not found", code="connection_not_found", status_code=404)
     objects = await sync_catalog(db, connection)
+    await sync_catalog_details(db, connection)
     dependencies = await sync_dependencies(db, connection)
     return LineageSyncResponse(objects_synced=objects, dependencies_synced=dependencies)
 
