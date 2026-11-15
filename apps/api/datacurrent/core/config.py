@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     request_timeout_seconds: float = 30.0
     query_timeout_ms: int = 15_000
     max_page_size: int = 100
+    allow_private_database_hosts: bool = False
+    database_host_allowlist: list[str] = ["demo-postgres", "postgres", "localhost"]
 
     @computed_field
     @property
