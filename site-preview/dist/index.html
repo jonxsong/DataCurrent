@@ -4,12 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#090d0f" />
-    <meta name="description" content="DataCurrent turns PostgreSQL and Snowflake telemetry into evidence-backed performance investigations." />
+    <meta
+      name="description"
+      content="DataCurrent turns PostgreSQL and Snowflake telemetry into evidence-backed performance investigations."
+    />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>DataCurrent — Database intelligence, in flow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -24,24 +30,52 @@
         <a href="#platform">Platform</a>
         <a href="#architecture">Architecture</a>
       </nav>
-      <a class="nav-cta" href="./app/">Launch demo <span>→</span></a>
+      <a
+        class="nav-cta"
+        href="https://github.com/jonxsong/DataCurrent#run-it-locally"
+        target="_blank"
+        rel="noreferrer"
+        >Deploy DataCurrent <span>↗</span></a
+      >
     </header>
 
     <main id="top">
       <section class="hero shell">
-        <div class="eyebrow"><span class="pulse"></span> PostgreSQL + Snowflake intelligence</div>
+        <div class="eyebrow">
+          <span class="pulse"></span> PostgreSQL + Snowflake intelligence
+        </div>
         <h1>Find the current<br /><em>behind every query.</em></h1>
-        <p class="hero-copy">DataCurrent connects workload signals, execution plans, lineage, and AI reasoning into one evidence-first investigation flow.</p>
+        <p class="hero-copy">
+          DataCurrent connects workload signals, execution plans, lineage, and
+          AI reasoning into one evidence-first investigation flow.
+        </p>
         <div class="hero-actions">
-          <a class="primary-button" href="./app/">Explore the working demo <span>→</span></a>
-          <a class="text-button" href="https://github.com/jonxsong/DataCurrent" target="_blank" rel="noreferrer">GitHub repository ↗</a>
+          <a
+            class="primary-button"
+            href="https://github.com/jonxsong/DataCurrent#run-it-locally"
+            target="_blank"
+            rel="noreferrer"
+            >Run the full application <span>↗</span></a
+          >
+          <a
+            class="text-button"
+            href="https://github.com/jonxsong/DataCurrent"
+            target="_blank"
+            rel="noreferrer"
+            >GitHub repository ↗</a
+          >
         </div>
         <div class="proof-row" aria-label="Product principles">
-          <span><b>01</b> Observe</span><span><b>02</b> Investigate</span><span><b>03</b> Recommend</span><span><b>04</b> Verify</span>
+          <span><b>01</b> Observe</span><span><b>02</b> Investigate</span
+          ><span><b>03</b> Recommend</span><span><b>04</b> Verify</span>
         </div>
       </section>
 
-      <section class="product-frame shell" id="platform" aria-label="Interactive DataCurrent product preview">
+      <section
+        class="product-frame shell"
+        id="platform"
+        aria-label="Interactive DataCurrent product preview"
+      >
         <div class="frame-bar">
           <div class="window-dots"><i></i><i></i><i></i></div>
           <span class="frame-title">acme-production / workload overview</span>
@@ -49,87 +83,289 @@
         </div>
         <div class="app-shell">
           <aside class="sidebar">
-            <div class="mini-brand"><span class="brand-mark"><i></i><i></i><i></i></span></div>
-            <button class="side-item active" data-panel="overview" aria-label="Overview">⌁</button>
-            <button class="side-item" data-panel="queries" aria-label="Queries">⌕</button>
-            <button class="side-item" data-panel="lineage" aria-label="Lineage">⌘</button>
-            <button class="side-item" data-panel="investigator" aria-label="AI investigator">✦</button>
+            <div class="mini-brand">
+              <span class="brand-mark"><i></i><i></i><i></i></span>
+            </div>
+            <button
+              class="side-item active"
+              data-panel="overview"
+              aria-label="Overview"
+            >
+              ⌁
+            </button>
+            <button class="side-item" data-panel="queries" aria-label="Queries">
+              ⌕
+            </button>
+            <button class="side-item" data-panel="lineage" aria-label="Lineage">
+              ⌘
+            </button>
+            <button
+              class="side-item"
+              data-panel="investigator"
+              aria-label="AI investigator"
+            >
+              ✦
+            </button>
           </aside>
           <div class="app-main">
             <div class="app-header">
-              <div><span class="kicker">WORKLOAD /</span><h2 id="panel-title">Overview</h2></div>
+              <div>
+                <span class="kicker">WORKLOAD /</span>
+                <h2 id="panel-title">Overview</h2>
+              </div>
               <button class="range-button">Last 24 hours <span>⌄</span></button>
             </div>
             <div class="metrics" id="metric-grid">
-              <article><span>Executions</span><strong>2.48M</strong><small class="up">↗ 8.2%</small></article>
-              <article><span>Mean latency</span><strong>42.8ms</strong><small class="down">↘ 12.4%</small></article>
-              <article><span>DB load</span><strong>18.4</strong><small class="neutral">– stable</small></article>
-              <article><span>Regressions</span><strong>03</strong><small class="warn">needs review</small></article>
+              <article>
+                <span>Executions</span><strong>2.48M</strong
+                ><small class="up">↗ 8.2%</small>
+              </article>
+              <article>
+                <span>Mean latency</span><strong>42.8ms</strong
+                ><small class="down">↘ 12.4%</small>
+              </article>
+              <article>
+                <span>DB load</span><strong>18.4</strong
+                ><small class="neutral">– stable</small>
+              </article>
+              <article>
+                <span>Regressions</span><strong>03</strong
+                ><small class="warn">needs review</small>
+              </article>
             </div>
             <div class="dashboard-grid">
               <article class="chart-card">
-                <div class="card-head"><div><span>Query latency</span><strong>p50 / p95</strong></div><span class="legend"><i></i> p95</span></div>
-                <div class="chart" aria-label="Illustrative query latency chart">
+                <div class="card-head">
+                  <div>
+                    <span>Query latency</span><strong>p50 / p95</strong>
+                  </div>
+                  <span class="legend"><i></i> p95</span>
+                </div>
+                <div
+                  class="chart"
+                  aria-label="Illustrative query latency chart"
+                >
                   <div class="grid-lines"></div>
-                  <svg viewBox="0 0 700 230" preserveAspectRatio="none" role="img">
-                    <defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#42e5c2" stop-opacity=".24"/><stop offset="1" stop-color="#42e5c2" stop-opacity="0"/></linearGradient></defs>
-                    <path class="area" d="M0 190 C80 184 90 151 145 162 S225 182 280 142 S360 99 410 125 S480 171 530 108 S610 65 700 83 L700 230 L0 230Z"/>
-                    <path class="line" d="M0 190 C80 184 90 151 145 162 S225 182 280 142 S360 99 410 125 S480 171 530 108 S610 65 700 83"/>
-                    <path class="line secondary" d="M0 210 C70 203 120 193 170 199 S265 176 315 188 S425 175 470 158 S570 145 700 150"/>
+                  <svg
+                    viewBox="0 0 700 230"
+                    preserveAspectRatio="none"
+                    role="img"
+                  >
+                    <defs>
+                      <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+                        <stop
+                          offset="0"
+                          stop-color="#42e5c2"
+                          stop-opacity=".24"
+                        />
+                        <stop
+                          offset="1"
+                          stop-color="#42e5c2"
+                          stop-opacity="0"
+                        />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      class="area"
+                      d="M0 190 C80 184 90 151 145 162 S225 182 280 142 S360 99 410 125 S480 171 530 108 S610 65 700 83 L700 230 L0 230Z"
+                    />
+                    <path
+                      class="line"
+                      d="M0 190 C80 184 90 151 145 162 S225 182 280 142 S360 99 410 125 S480 171 530 108 S610 65 700 83"
+                    />
+                    <path
+                      class="line secondary"
+                      d="M0 210 C70 203 120 193 170 199 S265 176 315 188 S425 175 470 158 S570 145 700 150"
+                    />
                   </svg>
-                  <div class="axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span></div>
+                  <div class="axis">
+                    <span>00:00</span><span>06:00</span><span>12:00</span
+                    ><span>18:00</span><span>Now</span>
+                  </div>
                 </div>
               </article>
               <article class="finding-card">
-                <div class="card-head"><div><span>Current finding</span><strong>Evidence-backed</strong></div><span class="severity">High</span></div>
+                <div class="card-head">
+                  <div>
+                    <span>Current finding</span><strong>Evidence-backed</strong>
+                  </div>
+                  <span class="severity">High</span>
+                </div>
                 <div class="finding-icon">⌁</div>
                 <h3>Sequential scan regression</h3>
-                <p>A filter on <code>orders.created_at</code> is scanning 8.4M rows after cardinality drift.</p>
-                <div class="evidence"><span>PLAN NODE</span><code>Seq Scan · cost 284,901</code></div>
-                <button id="inspect-button">Inspect evidence <span>→</span></button>
+                <p>
+                  A filter on <code>orders.created_at</code> is scanning 8.4M
+                  rows after cardinality drift.
+                </p>
+                <div class="evidence">
+                  <span>PLAN NODE</span><code>Seq Scan · cost 284,901</code>
+                </div>
+                <button id="inspect-button">
+                  Inspect evidence <span>→</span>
+                </button>
               </article>
             </div>
             <article class="query-table">
-              <div class="table-head"><div><span>Top query fingerprints</span><strong>By total execution time</strong></div><button>View all queries →</button></div>
-              <div class="table-row labels"><span>QUERY</span><span>DATABASE</span><span>CALLS</span><span>MEAN</span><span>CHANGE</span></div>
-              <div class="table-row"><span><i class="query-dot critical"></i><code>SELECT o.id, c.name FROM orders o…</code></span><span>PostgreSQL</span><span>48.2k</span><span>842ms</span><span class="bad">+62%</span></div>
-              <div class="table-row"><span><i class="query-dot"></i><code>SELECT event_type, COUNT(*) FROM events…</code></span><span>Snowflake</span><span>12.8k</span><span>318ms</span><span class="good">−14%</span></div>
-              <div class="table-row"><span><i class="query-dot"></i><code>WITH inventory_state AS (SELECT…</code></span><span>PostgreSQL</span><span>7.1k</span><span>146ms</span><span>+3%</span></div>
+              <div class="table-head">
+                <div>
+                  <span>Top query fingerprints</span
+                  ><strong>By total execution time</strong>
+                </div>
+                <button>View all queries →</button>
+              </div>
+              <div class="table-row labels">
+                <span>QUERY</span><span>DATABASE</span><span>CALLS</span
+                ><span>MEAN</span><span>CHANGE</span>
+              </div>
+              <div class="table-row">
+                <span
+                  ><i class="query-dot critical"></i
+                  ><code>SELECT o.id, c.name FROM orders o…</code></span
+                ><span>PostgreSQL</span><span>48.2k</span><span>842ms</span
+                ><span class="bad">+62%</span>
+              </div>
+              <div class="table-row">
+                <span
+                  ><i class="query-dot"></i
+                  ><code>SELECT event_type, COUNT(*) FROM events…</code></span
+                ><span>Snowflake</span><span>12.8k</span><span>318ms</span
+                ><span class="good">−14%</span>
+              </div>
+              <div class="table-row">
+                <span
+                  ><i class="query-dot"></i
+                  ><code>WITH inventory_state AS (SELECT…</code></span
+                ><span>PostgreSQL</span><span>7.1k</span><span>146ms</span
+                ><span>+3%</span>
+              </div>
             </article>
           </div>
         </div>
-        <p class="demo-note">Illustrative product preview · values shown are demo data, never production claims</p>
+        <p class="demo-note">
+          Illustrative product preview · values shown are demo data, never
+          production claims
+        </p>
       </section>
 
       <section class="workflow shell" id="workflow">
-        <div class="section-intro"><span class="section-number">01 / WORKFLOW</span><h2>From signal to measured outcome.</h2><p>Every recommendation keeps a visible chain of evidence—from the workload event that started the investigation to the benchmark that validates the result.</p></div>
+        <div class="section-intro">
+          <span class="section-number">01 / WORKFLOW</span>
+          <h2>From signal to measured outcome.</h2>
+          <p>
+            Every recommendation keeps a visible chain of evidence—from the
+            workload event that started the investigation to the benchmark that
+            validates the result.
+          </p>
+        </div>
         <div class="workflow-track">
-          <article><span>01</span><i>⌁</i><h3>Detect</h3><p>Capture cumulative statistics, snapshots, and regressions without inventing traces.</p></article>
-          <article><span>02</span><i>⌕</i><h3>Explain</h3><p>Read plan operators, schema context, and lineage as a single investigation.</p></article>
-          <article><span>03</span><i>✦</i><h3>Recommend</h3><p>Generate structured hypotheses with evidence, confidence, and tradeoffs.</p></article>
-          <article><span>04</span><i>✓</i><h3>Verify</h3><p>Benchmark safely in isolation and report median, p95, and result agreement.</p></article>
+          <article>
+            <span>01</span><i>⌁</i>
+            <h3>Detect</h3>
+            <p>
+              Capture cumulative statistics, snapshots, and regressions without
+              inventing traces.
+            </p>
+          </article>
+          <article>
+            <span>02</span><i>⌕</i>
+            <h3>Explain</h3>
+            <p>
+              Read plan operators, schema context, and lineage as a single
+              investigation.
+            </p>
+          </article>
+          <article>
+            <span>03</span><i>✦</i>
+            <h3>Recommend</h3>
+            <p>
+              Generate structured hypotheses with evidence, confidence, and
+              tradeoffs.
+            </p>
+          </article>
+          <article>
+            <span>04</span><i>✓</i>
+            <h3>Verify</h3>
+            <p>
+              Benchmark safely in isolation and report median, p95, and result
+              agreement.
+            </p>
+          </article>
         </div>
       </section>
 
       <section class="architecture shell" id="architecture">
-        <div class="section-intro"><span class="section-number">02 / ARCHITECTURE</span><h2>Built for evidence,<br />bounded by design.</h2><p>Credentials stay encrypted, AI tools receive minimized context, and production changes always remain under human control.</p></div>
+        <div class="section-intro">
+          <span class="section-number">02 / ARCHITECTURE</span>
+          <h2>Built for evidence,<br />bounded by design.</h2>
+          <p>
+            Credentials stay encrypted, AI tools receive minimized context, and
+            production changes always remain under human control.
+          </p>
+        </div>
         <div class="architecture-map">
-          <div class="arch-node sources"><span>DATA SOURCES</span><div><b>◉</b><strong>PostgreSQL</strong><small>pg_stat_statements</small></div><div><b>◇</b><strong>Snowflake</strong><small>ACCOUNT_USAGE</small></div></div>
-          <div class="arch-flow"><i></i><span>read-only telemetry</span><i></i></div>
-          <div class="arch-node core"><span>DATACURRENT CORE</span><div><b>⌁</b><strong>FastAPI + Workers</strong><small>collection · analysis · policy</small></div><div><b>▰</b><strong>Metadata store</strong><small>history · lineage · benchmarks</small></div></div>
-          <div class="arch-flow"><i></i><span>scoped evidence</span><i></i></div>
-          <div class="arch-node intelligence"><span>INTELLIGENCE</span><div><b>✦</b><strong>AI investigator</strong><small>structured, tool-bounded reasoning</small></div><div><b>✓</b><strong>Verification engine</strong><small>isolated empirical comparison</small></div></div>
+          <div class="arch-node sources">
+            <span>DATA SOURCES</span>
+            <div>
+              <b>◉</b><strong>PostgreSQL</strong
+              ><small>pg_stat_statements</small>
+            </div>
+            <div>
+              <b>◇</b><strong>Snowflake</strong><small>ACCOUNT_USAGE</small>
+            </div>
+          </div>
+          <div class="arch-flow">
+            <i></i><span>read-only telemetry</span><i></i>
+          </div>
+          <div class="arch-node core">
+            <span>DATACURRENT CORE</span>
+            <div>
+              <b>⌁</b><strong>FastAPI + Workers</strong
+              ><small>collection · analysis · policy</small>
+            </div>
+            <div>
+              <b>▰</b><strong>Metadata store</strong
+              ><small>history · lineage · benchmarks</small>
+            </div>
+          </div>
+          <div class="arch-flow">
+            <i></i><span>scoped evidence</span><i></i>
+          </div>
+          <div class="arch-node intelligence">
+            <span>INTELLIGENCE</span>
+            <div>
+              <b>✦</b><strong>AI investigator</strong
+              ><small>structured, tool-bounded reasoning</small>
+            </div>
+            <div>
+              <b>✓</b><strong>Verification engine</strong
+              ><small>isolated empirical comparison</small>
+            </div>
+          </div>
         </div>
       </section>
 
       <section class="cta shell">
-        <span class="section-number">OPEN SOURCE / IN DEVELOPMENT</span>
+        <span class="section-number">OPEN SOURCE / SELF-HOSTED</span>
         <h2>Understand your data.<br /><em>Optimize every query.</em></h2>
-        <p>Follow the build, run the reproducible demo, or contribute to DataCurrent.</p>
-        <a class="primary-button" href="./app/">Launch the product demo <span>→</span></a>
+        <p>
+          Deploy the complete API, workers, metadata store, and web application
+          with Docker Compose.
+        </p>
+        <a
+          class="primary-button"
+          href="https://github.com/jonxsong/DataCurrent#run-it-locally"
+          target="_blank"
+          rel="noreferrer"
+          >Run DataCurrent <span>↗</span></a
+        >
       </section>
     </main>
-    <footer class="shell"><a class="brand" href="#top"><span class="brand-mark"><i></i><i></i><i></i></span><span>DataCurrent</span></a><span>Evidence over guesswork.</span><span>© 2026</span></footer>
+    <footer class="shell">
+      <a class="brand" href="#top"
+        ><span class="brand-mark"><i></i><i></i><i></i></span
+        ><span>DataCurrent</span></a
+      ><span>Evidence over guesswork.</span><span>© 2026</span>
+    </footer>
     <script src="./app.js"></script>
   </body>
 </html>
