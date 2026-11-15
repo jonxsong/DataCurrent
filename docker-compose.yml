@@ -1,0 +1,116 @@
+name: datacurrent
+
+x-api-environment: &api-environment
+  DATACURRENT_ENV: development
+  DATACURRENT_SECRET_KEY: local-development-secret-key-change-before-production
+  DATACURRENT_ENCRYPTION_KEY: MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA=
+  DATABASE_URL: postgresql+psycopg://datacurrent:datacurrent@postgres:5432/datacurrent
+  REDIS_URL: redis://redis:6379/0
+  DATACURRENT_PUBLIC_URL: http://localhost:3000
+  CORS_ORIGINS: '["http://localhost:3000"]'
+  DATABASE_HOST_ALLOWLIST: '["demo-postgres","postgres","localhost"]'
+  OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5-mini}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: datacurrent
+      POSTGRES_USER: datacurrent
+      POSTGRES_PASSWORD: datacurrent
+    volumes:
+      - datacurrent-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U datacurrent -d datacurrent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  demo-postgres:
+    build: ./infrastructure/docker/demo-postgres
+    environment:
+      POSTGRES_DB: commerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "55432:5432"
+    volumes:
+      - demo-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d commerce"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - datacurrent-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ["alembic", "upgrade", "head"]
+    environment: *api-environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment: *api-environment
+    env_file:
+      - path: .env.local
+        required: false
+    ports:
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      demo-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/api/v1/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ["celery", "-A", "collector.celery_app:app", "worker", "--loglevel=INFO", "--concurrency=2"]
+    environment: *api-environment
+    env_file:
+      - path: .env.local
+        required: false
+    depends_on:
+      api:
+        condition: service_healthy
+
+  beat:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ["celery", "-A", "collector.celery_app:app", "beat", "--loglevel=INFO"]
+    environment: *api-environment
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  datacurrent-postgres:
+  demo-postgres:
+  datacurrent-redis:
