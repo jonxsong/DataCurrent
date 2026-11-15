@@ -102,7 +102,7 @@ class DatabaseConnection(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     status: Mapped[ConnectionStatus] = mapped_column(
         Enum(ConnectionStatus, name="connection_status"),
         default=ConnectionStatus.PENDING,
-        server_default=ConnectionStatus.PENDING.value,
+        server_default=ConnectionStatus.PENDING.name,
     )
     encrypted_config: Mapped[bytes] = mapped_column(LargeBinary)
     config_fingerprint: Mapped[str] = mapped_column(String(64))
